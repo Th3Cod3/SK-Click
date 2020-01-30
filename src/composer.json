@@ -1,0 +1,21 @@
+{
+    "name": "th3cod3/sk-click",
+    "authors": [
+        {
+            "name": "Th3Cod3",
+            "email": "th3-cod3-1230@hotmail.com"
+        }
+    ],
+    "autoload":{
+	    "psr-4":{
+            "App\\": "app/"
+        }	
+	},
+    "require": {
+        "phroute/phroute": "^2.1",
+        "twig/twig": "^2.5",
+        "siriusphp/validation": "^2.2",
+        "vlucas/phpdotenv": "^3.4",
+        "illuminate/database": "^6.11"
+    }
+}

@@ -1,0 +1,82 @@
+{% extends 'layout.twig' %}
+{% block content %}
+	<div class="mt-5">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="row">
+					<div class="col-md-8 col-lg-6 mx-auto">
+
+						<!-- form card login -->
+						<div class="card bg-light rounded-5">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-6 col-sm-12">
+										<div class="d-flex" style="height: 100%">
+											<div class=" align-self-center">
+												<img v-bind:src="imageUrl" class="img-fluid" alt="SK-Click logo">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6 col-sm-12 p-3">
+										<form class="form text-center" v-on:submit="login">
+											<h3 class="my-3">${ loginHeader }</h3>
+											<div class="form-group">
+												<input type="text" class="form-control form-control-lg rounded-5" name="user" v-model="username" v-bind:placeholder="inputNames.username" required>
+											</div>
+
+											<div class="form-group">
+												<input type="password" class="form-control form-control-lg" name="password" v-model="password" v-bind:placeholder="inputNames.password" required>
+											</div>
+
+											<button type="submit" class="btn btn-success btn-block">${ loginButton }</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+	<script>
+		let login = new Vue({
+			el: ".card",
+			delimiters: ["${", "}"],
+			data(){
+				return {
+					password: "",
+					username: "",
+					loginHeader: "User Login",
+					loginButton: "Login",
+					inputNames: {
+						password: "Password",
+						username: "Username"
+					},
+					imageUrl: "assets/img/SK-Click-logo.png"
+				}
+			},
+			methods: {
+				login: function (e) {
+					e.preventDefault();
+					let sendData = {
+						"password": this.password,
+						"username": this.username
+					}
+					loadData("login", sendData)
+						.then(data => {
+							if(data.login){
+								location.replace(data.url);
+							}else{
+								showError(errors);
+							}
+						})
+				}
+			}
+		});
+	</script>
+{% endblock %}

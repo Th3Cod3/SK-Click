@@ -21,6 +21,8 @@ CREATE TABLE users (
 	first_fail_password DATETIME NULL,
 	fail_counter TINYINT(1) NULL,
 	banned TINYINT(1) NULL,
+	last_edit_by INT NOT NULL,
+	created_by INT NOT NULL,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (id)
@@ -31,3 +33,4 @@ CREATE TABLE log_types (
 	type_name VARCHAR(100) NOT NULL,
 	PRIMARY KEY (id)
 );
+-- permissions

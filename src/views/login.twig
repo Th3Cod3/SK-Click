@@ -19,7 +19,7 @@
 									</div>
 									<div class="col-md-6 col-sm-12 p-3">
 										<form class="form text-center" v-on:submit="login">
-											<h3 class="my-3">${ loginHeader }</h3>
+											<h3 class="my-3">#{ loginHeader }</h3>
 											<div class="form-group">
 												<input type="text" class="form-control form-control-lg rounded-5" name="user" v-model="username" v-bind:placeholder="inputNames.username" required>
 											</div>
@@ -28,7 +28,7 @@
 												<input type="password" class="form-control form-control-lg" name="password" v-model="password" v-bind:placeholder="inputNames.password" required>
 											</div>
 
-											<button type="submit" class="btn btn-success btn-block">${ loginButton }</button>
+											<button type="submit" class="btn btn-success btn-block">#{ loginButton }</button>
 										</form>
 									</div>
 								</div>
@@ -46,7 +46,7 @@
 	<script>
 		let login = new Vue({
 			el: ".card",
-			delimiters: ["${", "}"],
+			delimiters: ["#{", "}"],
 			data(){
 				return {
 					password: "",
@@ -72,7 +72,7 @@
 							if(data.login){
 								location.replace(data.url);
 							}else{
-								showError(errors);
+								showError(data.errors);
 							}
 						})
 				}

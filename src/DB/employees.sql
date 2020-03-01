@@ -1,10 +1,8 @@
-CREATE TABLE persons (
+CREATE TABLE employees (
 	id INT NOT NULL AUTO_INCREMENT,
-	first_name VARCHAR(100) NOT NULL,
-	last_name VARCHAR(100) NOT NULL,
-	middle_name VARCHAR(100) NOT NULL,
-	birthdate DATE NULL,
-	gender TINYINT(1) NULL,
+	person_id INT NOT NULL,
+	from_date DATETIME NOT NULL,
+	to_date DATETIME NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

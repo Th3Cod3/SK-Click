@@ -1,7 +1,7 @@
-.src/composer.phar
-.src/composer.lock
-.src/vendor/
-.src/.env
+src/composer.phar
+src/composer.lock
+src/vendor/
+src/.env
 /dump/
 .vscode
 php.ini

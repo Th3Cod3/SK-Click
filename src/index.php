@@ -20,7 +20,6 @@ define('COOKIE_TIMEOUT', 60 * 24); // time in minute
 use App\Helpers\Permission;
 use Phroute\Phroute\RouteCollector;
 use Phroute\Phroute\Exception\HttpRouteNotFoundException;
-use App\Models\UsersModel;
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 
@@ -57,6 +56,7 @@ $router->filter('api', function () {
 
 $router->group(['before' => 'auth'], function ($router) {
 	$router->controller('home', App\Controllers\System\HomeController::class);
+	$router->controller('manage', App\Controllers\System\ManageController::class);
 });
 $router->group(['before' => 'api'], function ($router) {
 	$router->controller('api', App\Controllers\Api\ApiController::class);

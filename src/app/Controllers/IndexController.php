@@ -13,8 +13,9 @@ class IndexController extends TwigController
 
 	public function getLogin()
 	{
-		if(Login::checkSession())
+		if(Login::checkSession()){
 			header('Location:'.BASE_URL.'home/');
+		}
 
 		return $this->render('login.twig', [
 			'delnav' => true,

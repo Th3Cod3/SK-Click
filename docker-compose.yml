@@ -6,6 +6,7 @@ services:
     volumes:
       - ./src:/var/www/html
       - ./php.ini:/usr/local/etc/php/php.ini
+      - "/var/www/html/vendor/"
     ports:
       - "80:80"
     command: bash -c "service apache2 start && tail -f /dev/stderr"

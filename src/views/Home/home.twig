@@ -10,7 +10,7 @@
 					</span>
 				</div>
 				<div class="card-body main-card">
-					<div class="row" id="divisions-menu">
+					<div class="row">
 						<div class="col-12" v-show="load">
 							<div class="d-flex justify-content-center">
 								<div class="spinner-border text-dark" role="status">
@@ -31,31 +31,7 @@
 
 {% block javascript %}
 	<script>
-		Vue.component('divisionCard', {
-			props: ['division'],
-			delimiters: ["#{", "}"],
-			data: function () {
-				return {
-					count: 0
-				}
-			},
-			computed: {
-				divisionUrl: function () {
-					return '{{ "" | url }}manage/' + this.division.url
-				}
-			},
-			template: `
-				<a class="card bg-secondary text-white" v-bind:href="divisionUrl">
-					<div class="card-header font-weight-bold">
-						#{ division.name }
-					</div>
-					<div class="card-body">
-						#{ division.description }
-					</div>
-				</a>
-			`
-		});
-		let division = new Vue({
+		let home = new Vue({
 			el: "#app-body",
 			delimiters: ["#{", "}"],
 			data(){

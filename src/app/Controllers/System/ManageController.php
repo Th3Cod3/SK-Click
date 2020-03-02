@@ -4,6 +4,7 @@ namespace App\Controllers\System;
 
 use App\Controllers\TwigController;
 use App\Models\Division;
+use App\Models\Event;
 
 class ManageController extends TwigController
 {
@@ -11,8 +12,10 @@ class ManageController extends TwigController
 	{
 		$division = Division::where("url", $division_url)->firstOrFail();
 		return $this->render("Manage/manage.twig", [
+			'delnav' => true,
 			"app_title" => $division["name"],
-			"division" => $division->toArray()
+			"division" => $division->toArray(),
+			"division_id" => $division->id
 		]);
 	}
 }

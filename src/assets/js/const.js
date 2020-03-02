@@ -1,1 +1,1 @@
-const BASEURL = document.getElementById("BASE_URL").value
+const BASEURL = document.getElementById("BASE_URL").value;

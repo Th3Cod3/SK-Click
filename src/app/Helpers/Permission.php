@@ -14,24 +14,23 @@ class Permission{
 				$_COOKIE["APP_ID"] = $_SESSION["token"];
 				$_COOKIE["username"] = $_SESSION["username"];
 			}
-			$userInfo = User::where("username", $_COOKIE['username'])->first();
-			$minuteAgoFromLastActivity = (time() - strtotime($userInfo['last_activity'])) / 60;
-			if (!isset($_COOKIE['username']) || $userInfo['banned'] == 1 || $minuteAgoFromLastActivity > SESSION_TIMEOUT ||  $_COOKIE['APP_ID'] != $userInfo['token']) {
+			$user = User::where("username", $_COOKIE['username'])->first();
+			$minuteAgoFromLastActivity = (time() - strtotime($user['last_activity'])) / 60;
+			if (!isset($_COOKIE['username']) || $user['banned'] == 1 || $minuteAgoFromLastActivity > SESSION_TIMEOUT ||  $_COOKIE['APP_ID'] != $user['token']) {
 				header('Location: ' . BASE_URL . 'logout');
 				return false;
 			}
-			if (!isset($_SESSION['user_id']) && $_COOKIE['APP_ID'] === $userInfo['token'] && $minuteAgoFromLastActivity < SESSION_TIMEOUT && !$userInfo['banned']) {
-				$_SESSION['user_id'] = $userInfo['user_id'];
-				$_SESSION['username'] = $userInfo['username'];
-				$_SESSION['firstname'] = $userInfo['firstname'];
-				$_SESSION['lastname'] = $userInfo['lastname'];
-				$_SESSION['gender'] = $userInfo['gender'];
-				$_SESSION['person_id'] = $userInfo['person_id'];
+			if (!isset($_SESSION['user_id']) && $_COOKIE['APP_ID'] === $user['token'] && $minuteAgoFromLastActivity < SESSION_TIMEOUT && !$user['banned']) {
+				$_SESSION['user_id'] = $user->id;
+				$_SESSION['username'] = $user->username;
 			}
-			if (isset($_SESSION['user_id'])) $UsersModel->updateUserActivity($_SESSION['user_id']);
+			if (isset($_SESSION['user_id'])){
+				$user->last_activity = date('Y-m-d H:i:s');
+				$user->save();
+			}
 	
 			if(!preg_match("/^ajax\/.*/", $_GET["route"])){
-				// $_SESSION['rol'] = $UsersModel->getRol($userInfo['permission']); TODO: ROL
+				// $_SESSION['rol'] = $UsersModel->getRol($user['permission']); TODO: ROL
 			}
 		} else {
 			header('Location: ' . BASE_URL . 'logout');

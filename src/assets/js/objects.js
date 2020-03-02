@@ -1,16 +1,18 @@
 /*
-/* options
+/* Obj options
 /* |	modalId
 /* |	modalSize (optional)
 /* |	modalTitle
 /* |	apiDir
 /* |	apiDir
 /* |	sendData
+/* Func getForm(self)
+/* Func getForm(data, form)
 */
 
 function modalForm(
 	options = {},
-	callbacks = { getForm: undefined, callbacks: undefined }
+	callbacks = { getForm: undefined, savedForm: undefined }
 ) {
 	self = this;
 	self.options = options;

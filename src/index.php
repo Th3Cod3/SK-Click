@@ -15,7 +15,7 @@ define('APP_VERSION', $version);
 define('BASE_URL', $baseUrl);
 define('USER_LOCK_TIME', 15); // time in minute
 define('SESSION_TIMEOUT', 30); // time in minute
-define('COOKIE_TIMEOUT', 60 * 24); // time in minute
+define('COOKIE_TIMEOUT', 60 * 24 * 7); // time in minute
 
 use App\Helpers\Permission;
 use Phroute\Phroute\RouteCollector;

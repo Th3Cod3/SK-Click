@@ -1,15 +1,36 @@
 {% extends 'layout.twig' %}
 {% block content %}
-	<div class="mt-5" id="division-dashboard">
+	<div class="mt-5">
 		<div class="container">
 			<div class="card">
 				<div class="card-header text-center font-weight-bold">
-					#{ division.name }
+					<span class="float-left">
+						<a class="btn btn-info btn-sm" v-bind:href="BASEURL + 'home'">
+							Back
+						</a>
+					</span>
+					#{ division.name } events
+					<span class="float-right">
+						<button class="btn btn-success btn-sm" data-target="btn-event" data-division-id="{{ division_id }}" data-ajax="new">
+							Add Event
+						</button>
+					</span>
 				</div>
 				<div class="card-body main-card">
 					<div class="loader"></div>
 						<div class="row">
+						<div class="col-12" v-show="load">
+							<div class="d-flex justify-content-center">
+								<div class="spinner-border text-dark" role="status">
+									<span class="sr-only">Loading...</span>
+								</div>
+							</div>
 						</div>
+						<div class="col-md-6 col-sm-12 mb-3" v-for="event in events">
+							<event-card v-bind:event="event">
+							</event-card>
+						</div>
+					</div>
 					</div>
 				</div>
 			</div>
@@ -19,13 +40,24 @@
 
 {% block javascript %}
 	<script>
-		let login = new Vue({
+		let division = new Vue({
 			el: "#app-body",
 			delimiters: ["#{", "}"],
 			data(){
 				return {
-					division: {{ division | json_encode | raw }}
+					division: {{ division | json_encode | raw }},
+					events: [],
+					load: true,
+					BASEURL
 				}
+			},
+			created: function (){
+				let self = this
+				loadData("events", { division_id: this.division.id })
+					.then(data => {
+						self.events = data.events;
+						self.load = false;
+					})
 			}
 		});
 	</script>	

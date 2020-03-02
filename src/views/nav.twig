@@ -1,22 +1,22 @@
-<nav class="navbar navbar-expand-lg {% if 'APP_MODE' | _ENV == "production" %}navbar-dark bg-dark{% else %}navbar-light bg-light{% endif %}">
+<nav class="navbar navbar-expand-lg {% if 'APP_MODE' | _ENV == " production" %}navbar-dark bg-dark{% else %}navbar-light bg-light{% endif %}">
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navBarMenu" aria-controls="navBarMenu" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
 	<div class="collapse navbar-collapse" id="navBarMenu">
 		<ul class="navbar-nav">
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Main
-					</a>
-					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" href="{{ 'person' | url }}">Person</a>
-						<a class="dropdown-item" href="{{ 'company' | url }}">Company</a>
-					</div>
-				</li>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Main
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+					<a class="dropdown-item" href="{{ 'person' | url }}">Person</a>
+					<a class="dropdown-item" href="{{ 'company' | url }}">Company</a>
+				</div>
+			</li>
 
-				<li class="nav-item">
-					<a class="nav-link {% if 'APP_MODE' | _ENV == "production" %}text-white{% else %}text-dark{% endif %}" href="{{ 'event/all' | url }}">Events</a>
-				</li>
+			<li class="nav-item">
+				<a class="nav-link {% if 'APP_MODE' | _ENV == " production" %}text-white{% else %}text-dark{% endif %}" href="{{ 'event/all' | url }}">Events</a>
+			</li>
 		</ul>
 		<ul class="navbar-nav ml-auto">
 			<li class="nav-item dropdown mr-2">
@@ -24,17 +24,17 @@
 					Add
 				</button>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-					<a class="dropdown-item cursor-pointer" data-target="person-action" data-ajax-type="new">Person</a>
-					<a class="dropdown-item cursor-pointer" data-target="company-action" data-ajax-type="new">Company</a>
-					<a class="dropdown-item cursor-pointer" data-target="event-action" data-ajax-type="new">Event</a>
+					<a class="dropdown-item cursor-pointer" data-target="btn-person" data-ajax="new">Person</a>
+					<a class="dropdown-item cursor-pointer" data-target="btn-company" data-ajax="new">Company</a>
+					<a class="dropdown-item cursor-pointer" data-target="btn-event" data-division-id="{{ division_id }}" data-ajax="new">Event</a>
 				</div>
 			</li>
 			{# <li class="nav-item">
-				<a class="navbar-brand" href="{{ 'user/' | url }}{{ 'user' | _SESSION }}">
-					<i class="fas fa-bell text-danger fa-xs d-none"></i>
-					{{ 'firstname' | _SESSION }}
-				</a>
-			</li> #}
+							<a class="navbar-brand" href="{{ 'user/' | url }}{{ 'user' | _SESSION }}">
+								<i class="fas fa-bell text-danger fa-xs d-none"></i>
+								{{ 'firstname' | _SESSION }}
+							</a>
+						</li> #}
 			<li class="nav-item">
 				<a class="navbar-brand" href="{{ 'dashboard' | url }}">Dashboard</a>
 			</li>

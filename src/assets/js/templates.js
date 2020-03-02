@@ -1,6 +1,6 @@
 let app = {
 	templates: {}
-}
+};
 
 app.templates.modalHTML = modalId => {
 	return `

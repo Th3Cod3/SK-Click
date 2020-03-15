@@ -100,3 +100,4 @@ const getFormData = formElement => {
 	}
 	return sendData;
 };
+

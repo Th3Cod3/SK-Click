@@ -6,13 +6,13 @@
 				<div class="card-header text-center font-weight-bold">
 					<span class="float-left">
 						<a class="btn btn-info btn-sm" v-bind:href="BASEURL + 'home'">
-							Back
+							<i class="fas fa-backward"></i> <span class="d-none d-md-inline">Back</span>
 						</a>
 					</span>
 					#{ division.name } events
 					<span class="float-right">
 						<button class="btn btn-success btn-sm" data-target="btn-event" data-division-id="{{ division_id }}" data-ajax="new">
-							Add Event
+							<i class="fas fa-plus"></i> <span class="d-none d-md-inline">Add Event</span>
 						</button>
 					</span>
 				</div>
@@ -60,5 +60,5 @@
 					})
 			}
 		});
-	</script>	
+	</script>
 {% endblock %}

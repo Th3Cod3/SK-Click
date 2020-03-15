@@ -1,13 +1,30 @@
-CREATE TABLE events (
+CREATE TABLE photobooths (
 	id INT NOT NULL AUTO_INCREMENT,
-	ref_num VARCHAR(15) NOT NULL UNIQUE,
+	name VARCHAR(30) NOT NULL,
 	division_id INT NOT NULL,
+	booth_type VARCHAR(100) NOT NULL,
+	last_edit_by INT NOT NULL,
+	created_by INT NOT NULL,
+	deleted_at TIMESTAMP NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE booths_types (
+	id INT NOT NULL AUTO_INCREMENT,
+	name VARCHAR(30) NOT NULL UNIQUE,
+	last_edit_by INT NOT NULL,
+	created_by INT NOT NULL,
+	deleted_at TIMESTAMP NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE backdrops (
+	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(100) NOT NULL,
-	venue VARCHAR(100) NOT NULL,
-	from_date DATETIME NOT NULL,
-	to_date DATETIME NOT NULL,
-	printing TINYINT(1) NOT NULL,
-	usb TINYINT(1) NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,
@@ -16,11 +33,9 @@ CREATE TABLE events (
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE event_photobooths (
+CREATE TABLE props (
 	id INT NOT NULL AUTO_INCREMENT,
-	photobooth_id INT NOT NULL,
-	event_id INT NOT NULL,
-	backdrop INT NOT NULL,
+	name VARCHAR(100) NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,
@@ -29,10 +44,9 @@ CREATE TABLE event_photobooths (
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE event_attendees (
+CREATE TABLE themas (
 	id INT NOT NULL AUTO_INCREMENT,
-	employee_id INT NOT NULL,
-	event_id INT NOT NULL,
+	name VARCHAR(100) NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,

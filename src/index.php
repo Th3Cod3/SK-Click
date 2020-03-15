@@ -57,6 +57,7 @@ $router->filter('api', function () {
 $router->group(['before' => 'auth'], function ($router) {
 	$router->controller('home', App\Controllers\System\HomeController::class);
 	$router->controller('manage', App\Controllers\System\ManageController::class);
+	$router->controller('dashboard', App\Controllers\System\DashboardController::class);
 });
 $router->group(['before' => 'api'], function ($router) {
 	$router->controller('api', App\Controllers\Api\ApiController::class);

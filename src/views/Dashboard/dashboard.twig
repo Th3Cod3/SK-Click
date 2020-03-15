@@ -1,0 +1,79 @@
+{% extends 'layout.twig' %}
+{% block content %}
+	<div class="mt-5">
+		<div class="container-md">
+			<div class="card">
+				<div class="card-header text-center font-weight-bold">
+					<span class="float-left">
+						<a class="btn btn-info btn-sm" :href="BASEURL + 'home'">
+							<i class="fas fa-backward"></i> <span class="d-none d-md-inline">Back</span>
+						</a>
+					</span>
+					Dashboard
+				</div>
+				<div class="card-body main-card">
+					<div class="row">
+						<div class="col-12 mb-3">
+						<ul class="nav nav-tabs text-primary">
+							<li class="nav-item">
+								<span :class="{'nav-link': true, active: component == 'divisionsList' ? true : false }" v-on:click="changeComponent('divisionsList')">Divisions</span>
+							</li>
+							<li class="nav-item">
+								<span :class="{'nav-link': true, active: component == 'booths' ? true : false }" v-on:click="changeComponent('booths')">Photobooths</span>
+							</li>
+							<li class="nav-item">
+								<span :class="{'nav-link': true, active: component == 'backdrops' ? true : false }" v-on:click="changeComponent('backdrops')">Backdrops</span>
+							</li>
+							<li class="nav-item">
+								<span :class="{'nav-link': true, active: component == 'props' ? true : false }" v-on:click="changeComponent('props')">Props</span>
+							</li>
+							<li class="nav-item">
+								<span :class="{'nav-link': true, disabled: true, active: component == 'employees' ? true : false }" v-on:click="changeComponent('employees')">Users</span>
+							</li>
+							<li class="nav-item">
+								<span :class="{'nav-link': true, active: component == 'employees' ? true : false }" v-on:click="changeComponent('employees')">Employees</span>
+							</li>
+						</ul>
+						</div>
+						<div class="col-12" v-show="loading">
+							<div class="d-flex justify-content-center">
+								<div class="spinner-border text-dark" role="status">
+									<span class="sr-only">Loading...</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-12">
+							<component v-on:loading="toggleLoaderIcon" :is="component"></component>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+	<script>
+		let home = new Vue({
+			el: "#app-body",
+			delimiters: ["#{", "}"],
+			data(){
+				return {
+					divisions: [],
+					loading: true,
+					dashboardUrl: BASEURL + 'dashboard/',
+					component: "divisionsList",
+					BASEURL
+				}
+			},
+			methods:{
+				changeComponent: function (component) {
+					this.component = component;
+				},
+				toggleLoaderIcon: function (loading) {
+					this.loading = loading;
+				}
+			}
+		});
+	</script>
+{% endblock %}

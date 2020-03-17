@@ -48,6 +48,8 @@ const getValueById = id => {
 	return document.getElementById(id) && document.getElementById(id).value;
 };
 
+
+// TODO makes this function a component
 const showError = (error, $element) => {
 	if (!$element) {
 		$element = document.body;
@@ -57,7 +59,7 @@ const showError = (error, $element) => {
 		$element.insertAdjacentHTML(
 			"afterbegin",
 			`
-		<div data-error-id="${date.getTime}" class="fixed-top container mt-3 alert alert-danger alert-dismissible fade show" role="alert">
+		<div data-error-id="${date.getTime}" class="fixed-top container mt-3 alert alert-danger alert-dismissible fade show" role="alert" style="z-index: 10000">
 			<strong>${key}</strong> ${error[key]}.
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 				<span aria-hidden="true">&times;</span>

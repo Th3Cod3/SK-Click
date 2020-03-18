@@ -14,72 +14,25 @@
 			<div class="card-body main-card">
 				<div class="row">
 					<div class="col-12 mb-3">
-						<ul class="nav nav-tabs text-primary">
-							<li class="nav-item">
-								<span
-									:class="{'nav-link': true, active: component == 'divisionsList' ? true : false }"
-									v-on:click="changeComponent('divisionsList')"
-									>Divisions</span
-								>
-							</li>
-							<li class="nav-item">
-								<span
-									:class="{'nav-link': true, active: component == 'boothTypesList' ? true : false }"
-									v-on:click="changeComponent('boothTypesList')"
-									>Photobooths</span
-								>
-							</li>
-							<li class="nav-item">
-								<span
-									:class="{'nav-link': true, active: component == 'backdropsList' ? true : false }"
-									v-on:click="changeComponent('backdropsList')"
-									>Backdrops</span
-								>
-							</li>
-							<li class="nav-item">
-								<span
-									:class="{'nav-link': true, active: component == 'propsList' ? true : false }"
-									v-on:click="changeComponent('propsList')"
-									>Props</span
-								>
-							</li>
-							<li class="nav-item">
-								<span
-									:class="{'nav-link': true, disabled: true, active: component == 'usersList' ? true : false }"
-									v-on:click="changeComponent('usersList')"
-									>Users</span
-								>
-							</li>
-							<li class="nav-item">
-								<span
-									:class="{'nav-link': true, disabled: true, active: component == 'permissionsList' ? true : false }"
-									v-on:click="changeComponent('permissionsList')"
-									>Permissions</span
-								>
-							</li>
-						</ul>
-					</div>
-					<div class="col-12" v-show="loading">
-						<div class="d-flex justify-content-center">
-							<div class="spinner-border text-dark" role="status">
-								<span class="sr-only">Loading...</span>
-							</div>
-						</div>
+						<tabs-navbar
+							:active="component"
+							:options="options"
+							@change-option="changeComponent"
+						>
+						</tabs-navbar>
 					</div>
 					<div class="col-12">
-						<component
-							v-on:loading="toggleLoaderIcon"
-							:is="component"
-						></component>
+						<loader :loading="loading"></loader>
+					</div>
+					<div class="col-12">
+						<component @loading="toggleLoaderIcon" :is="component"></component>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-{% endblock %}
-
-{% block javascript %}
+{% endblock %} {% block javascript %}
 <script>
 	let home = new Vue({
 		el: "#app-body",
@@ -88,16 +41,43 @@
 			return {
 				divisions: [],
 				loading: true,
-				dashboardUrl: BASEURL + "dashboard/",
+				options: [
+					{
+						name: "Divisions",
+						active: "divisionsList"
+					},
+					{
+						name: "Photobooths",
+						active: "boothTypesList"
+					},
+					{
+						name: "Backdrops",
+						active: "backdropsList"
+					},
+					{
+						name: "Props",
+						active: "propsList"
+					},
+					{
+						name: "Users",
+						active: "usersList",
+						disabled: true
+					},
+					{
+						name: "Permissions",
+						active: "permissionsList",
+						disabled: true
+					}
+				],
 				component: "divisionsList",
 				BASEURL
 			};
 		},
 		methods: {
-			changeComponent: function(component) {
+			changeComponent(component) {
 				this.component = component;
 			},
-			toggleLoaderIcon: function(loading) {
+			toggleLoaderIcon(loading) {
 				this.loading = loading;
 			}
 		}

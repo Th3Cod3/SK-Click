@@ -1,61 +1,60 @@
-{% extends 'layout.twig' %}
-{% block content %}
-	<div class="mt-5">
-		<div class="container-md">
-			<div class="card">
-				<div class="card-header text-center font-weight-bold">
-					Divisions
-					<span class="float-right">
-						<div class="btn-group btn-group-sm">
-							<a class="btn btn-primary" v-bind:href="dashboardUrl"><i class="fas fa-cog"></i> <span class="d-none d-md-inline">Dashboard</span></a>
-						</div>
-					</span>
-				</div>
-				<div class="card-body main-card">
-					<div class="row">
-						<div class="col-12" v-show="loading">
-							<div class="d-flex justify-content-center">
-								<div class="spinner-border text-dark" role="status">
-									<span class="sr-only">Loading...</span>
-								</div>
+{% extends 'layout.twig' %} {% block content %}
+<div class="mt-5">
+	<div class="container-md">
+		<div class="card">
+			<div class="card-header text-center font-weight-bold">
+				Divisions
+				<span class="float-right">
+					<div class="btn-group btn-group-sm">
+						<a class="btn btn-primary" :href="dashboardUrl"
+							><i class="fas fa-cog"></i>
+							<span class="d-none d-md-inline">Dashboard</span></a
+						>
+					</div>
+				</span>
+			</div>
+			<div class="card-body main-card">
+				<div class="row">
+					<div class="col-12" v-show="loading">
+						<div class="d-flex justify-content-center">
+							<div class="spinner-border text-dark" role="status">
+								<span class="sr-only">Loading...</span>
 							</div>
 						</div>
-						<div class="col-md-6 col-sm-12 mb-3" v-for="division in divisions">
-							<division-card v-on:loading="toggleLoaderIcon" v-bind:division="division">
-							</division-card>
-						</div>
+					</div>
+					<div class="col-md-6 col-sm-12 mb-3" v-for="division in divisions">
+						<division-card @loading="toggleLoaderIcon" :division="division">
+						</division-card>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-{% endblock %}
-
-{% block javascript %}
-	<script>
-		let home = new Vue({
-			el: "#app-body",
-			delimiters: ["#{", "}"],
-			data(){
-				return {
-					divisions: [],
-					loading: true,
-					dashboardUrl: BASEURL + 'dashboard/'
-				}
-			},
-			created: function (){
-				let self = this
-				loadData("divisions")
-					.then(data => {
-						self.divisions = data.divisions;
-						self.loading = false;
-					})
-			},
-			methods: {
-				toggleLoaderIcon: function (loading) {
-					this.loading = loading;
-				}
+</div>
+{% endblock %} {% block javascript %}
+<script>
+	let home = new Vue({
+		el: "#app-body",
+		delimiters: ["#{", "}"],
+		data() {
+			return {
+				divisions: [],
+				loading: true,
+				dashboardUrl: BASEURL + "dashboard/"
+			};
+		},
+		created: function() {
+			let self = this;
+			loadData("divisions").then(data => {
+				self.divisions = data.divisions;
+				self.loading = false;
+			});
+		},
+		methods: {
+			toggleLoaderIcon: function(loading) {
+				this.loading = loading;
 			}
-		});
-	</script>
+		}
+	});
+</script>
 {% endblock %}

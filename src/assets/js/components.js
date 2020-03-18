@@ -1,13 +1,71 @@
+/***********************
+ * EVENT COMPONENTS
+ ************************/
+
+/*
+/* EVENT CARD
+*/
+Vue.component("loader", {
+	props: {
+		loading: {},
+		options: {
+			Type: Object,
+			default: () => {
+				return {};
+			}
+		}
+	},
+	delimiters: ["#{", "}"],
+	data: () => ({}),
+	template: `
+	<div v-if="loading">
+		<div class="d-flex flex-column">
+			<div class="d-block text-center">
+				<div class="spinner-border text-dark" role="status">
+					<span class="sr-only"></span>
+				</div>
+			</div>
+			<div v-if="options.text" class="d-block text-center pt-2">
+				#{ options.text }
+			</div>
+		</div>
+	</div>
+	`
+});
+
+Vue.component("tabsNavbar", {
+	props: ["active", "options"],
+	delimiters: ["#{", "}"],
+	data: () => ({}),
+	methods: {
+		clicked(selectedOption) {
+			this.$emit("change-option", selectedOption);
+		}
+	},
+	template: `
+	<ul class="nav nav-tabs text-primary">
+		<li v-for="option in options" class="nav-item">
+			<span
+				:class="{
+					'nav-link': true,
+					'active': active == option.active ? true : false,
+					'disabled': option.disabled ? true : false
+				}"
+				@click="clicked(option.active)"
+			>
+				#{ option.name }
+			</span>
+		</li>
+	</ul>
+	`
+});
+
 Vue.component("eventCard", {
 	props: ["event"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			count: 0
-		};
-	},
+	data: () => ({}),
 	computed: {
-		eventUrl: function() {
+		eventUrl() {
 			return BASEURL + "event/" + this.event.id;
 		}
 	},
@@ -51,14 +109,10 @@ Vue.component("eventCard", {
 Vue.component("divisionCard", {
 	props: ["division"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			count: 0
-		};
-	},
+	data: () => ({}),
 	computed: {
-		divisionUrl: function() {
-			return BASEURL + "manage/" + this.division.url;
+		divisionUrl() {
+			return BASEURL + "division/" + this.division.url;
 		}
 	},
 	template: `
@@ -78,40 +132,37 @@ Vue.component("divisionCard", {
 */
 Vue.component("divisionsList", {
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			divisions: [],
-			modalComponent: false
-		};
-	},
+	data: () => ({
+		divisions: [],
+		modalComponent: false
+	}),
 	computed: {
-		divisionUrl: function() {
-			return BASEURL + "manage/" + this.division.url;
+		divisionUrl() {
+			return BASEURL + "division/" + this.division.url;
 		}
 	},
-	created: function() {
-		let self = this;
-		self.$emit("loading", false);
+	created() {
+		this.$emit("loading", false);
 		loadData("divisions").then(data => {
-			self.divisions = data.divisions;
-			self.load = false;
-			self.$emit("loading", false);
+			this.divisions = data.divisions;
+			this.load = false;
+			this.$emit("loading", false);
 		});
 	},
 	methods: {
-		closeModal: function() {
+		closeModal() {
 			this.modalComponent = false;
 		},
-		editDivision: function() {
+		editDivision() {
 			alert("pending");
 		},
-		deleteDivision: function() {
+		deleteDivision() {
 			alert("pending");
 		},
-		createDivision: function() {
+		createDivision() {
 			this.modalComponent = "divisionForm";
 		},
-		insertNewDivision: function(data) {
+		insertNewDivision(data) {
 			this.divisions.push(data.division);
 		}
 	},
@@ -168,29 +219,26 @@ Vue.component("divisionsList", {
 Vue.component("divisionForm", {
 	props: ["division"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			divisionModel: {
-				name: "",
-				description: ""
-			},
-			ajax: "new",
-			loading: false
-		};
-	},
+	data: () => ({
+		divisionModel: {
+			name: "",
+			description: ""
+		},
+		ajax: "new",
+		loading: false
+	}),
 	methods: {
-		saveDivision: function(e) {
-			let self = this;
+		saveDivision(e) {
 			e.preventDefault();
-			self.loading = true;
+			this.loading = true;
 			loadData("division", {
-				...self.divisionModel,
-				ajax: self.ajax
+				...this.divisionModel,
+				ajax: this.ajax
 			}).then(data => {
 				if (data.save) {
-					self.$emit("saved", data);
+					this.$emit("saved", data);
 				} else {
-					self.loading = false;
+					this.loading = false;
 				}
 				if (data.error) {
 					showError(data.error);
@@ -236,35 +284,32 @@ Vue.component("divisionForm", {
 */
 Vue.component("boothTypesList", {
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			boothTypes: [],
-			modalComponent: false
-		};
-	},
-	created: function() {
-		let self = this;
-		self.$emit("loading", false);
+	data: () => ({
+		boothTypes: [],
+		modalComponent: false
+	}),
+	created() {
+		this.$emit("loading", false);
 		loadData("booth_types").then(data => {
-			self.boothTypes = data.booth_types;
-			self.load = false;
-			self.$emit("loading", false);
+			this.boothTypes = data.booth_types;
+			this.load = false;
+			this.$emit("loading", false);
 		});
 	},
 	methods: {
-		closeModal: function() {
+		closeModal() {
 			this.modalComponent = false;
 		},
-		editBoothType: function() {
+		editBoothType() {
 			alert("pending");
 		},
-		deleteBoothType: function() {
+		deleteBoothType() {
 			alert("pending");
 		},
-		newBoothType: function() {
+		newBoothType() {
 			this.modalComponent = "boothTypeForm";
 		},
-		insertNewBoothType: function(data) {
+		insertNewBoothType(data) {
 			this.boothTypes.push(data.booth_type);
 		}
 	},
@@ -330,29 +375,26 @@ Vue.component("boothTypesList", {
 Vue.component("boothTypeForm", {
 	props: ["boothType"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			boothTypeModel: {
-				name: "",
-				description: ""
-			},
-			ajax: "new",
-			loading: false
-		};
-	},
+	data: () => ({
+		boothTypeModel: {
+			name: "",
+			description: ""
+		},
+		ajax: "new",
+		loading: false
+	}),
 	methods: {
-		saveBoothType: function(e) {
-			let self = this;
+		saveBoothType(e) {
 			e.preventDefault();
-			self.loading = true;
+			this.loading = true;
 			loadData("booth_type", {
-				...self.boothTypeModel,
-				ajax: self.ajax
+				...this.boothTypeModel,
+				ajax: this.ajax
 			}).then(data => {
 				if (data.save) {
-					self.$emit("saved", data);
+					this.$emit("saved", data);
 				} else {
-					self.loading = false;
+					this.loading = false;
 				}
 				if (data.error) {
 					showError(data.error);
@@ -401,35 +443,32 @@ Vue.component("boothTypeForm", {
 */
 Vue.component("backdropsList", {
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			backdrops: [],
-			modalComponent: false
-		};
-	},
-	created: function() {
-		let self = this;
-		self.$emit("loading", false);
+	data: () => ({
+		backdrops: [],
+		modalComponent: false
+	}),
+	created() {
+		this.$emit("loading", false);
 		loadData("backdrops").then(data => {
-			self.backdrops = data.backdrops;
-			self.load = false;
-			self.$emit("loading", false);
+			this.backdrops = data.backdrops;
+			this.load = false;
+			this.$emit("loading", false);
 		});
 	},
 	methods: {
-		closeModal: function() {
+		closeModal() {
 			this.modalComponent = false;
 		},
-		editBackdrop: function() {
+		editBackdrop() {
 			alert("pending");
 		},
-		deleteBackdrop: function() {
+		deleteBackdrop() {
 			alert("pending");
 		},
-		newBackdrop: function() {
+		newBackdrop() {
 			this.modalComponent = "backdropForm";
 		},
-		insertNewBackdrop: function(data) {
+		insertNewBackdrop(data) {
 			this.backdrops.push(data.backdrop);
 		}
 	},
@@ -437,11 +476,11 @@ Vue.component("backdropsList", {
 	<div class="row">
 		<div class="col-12">
 			<button class="btn btn-success my-3 btn-block" @click="newBackdrop">
-				<i class="fas fa-plus float-left" style="line-height: inherit" ></i> New Photobooth
+				<i class="fas fa-plus float-left" style="line-height: inherit" ></i> New Backdrop
 			</button>
 			<modal 
 				v-if="modalComponent"
-				:modal-info="{id: 'modal-backdrops', title: 'Photobooth type'}"
+				:modal-info="{id: 'modal-backdrops', title: 'Backdrop'}"
 				:component="modalComponent"
 				@modalClosed="closeModal"
 				@saved="insertNewBackdrop">
@@ -495,29 +534,26 @@ Vue.component("backdropsList", {
 Vue.component("backdropForm", {
 	props: ["backdrop"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			backdropModel: {
-				name: "",
-				description: ""
-			},
-			ajax: "new",
-			loading: false
-		};
-	},
+	data: () => ({
+		backdropModel: {
+			name: "",
+			description: ""
+		},
+		ajax: "new",
+		loading: false
+	}),
 	methods: {
-		saveBackdrop: function(e) {
-			let self = this;
+		saveBackdrop(e) {
 			e.preventDefault();
-			self.loading = true;
+			this.loading = true;
 			loadData("backdrop", {
-				...self.backdropModel,
-				ajax: self.ajax
+				...this.backdropModel,
+				ajax: this.ajax
 			}).then(data => {
 				if (data.save) {
-					self.$emit("saved", data);
+					this.$emit("saved", data);
 				} else {
-					self.loading = false;
+					this.loading = false;
 				}
 				if (data.error) {
 					showError(data.error);
@@ -540,11 +576,11 @@ Vue.component("backdropForm", {
 			<div class="col-12">
 				<div class="input-group mb-3">
 					<div class="input-group-prepend">
-						<span class="input-group-text" id="photobooth_upload">Upload</span>
+						<span class="input-group-text" id="backdrop_upload">Upload</span>
 					</div>
 					<div class="custom-file">
-						<input type="file" class="custom-file-input" id="photobooth_image" name="image" aria-describedby="photobooth_upload" disabled>
-						<label class="custom-file-label" for="photobooth_image">Choose file</label>
+						<input type="file" class="custom-file-input" id="backdrop_image" name="image" aria-describedby="backdrop_upload" disabled>
+						<label class="custom-file-label" for="backdrop_image">Choose file</label>
 					</div>
 				</div>
 			</div>
@@ -566,35 +602,32 @@ Vue.component("backdropForm", {
 */
 Vue.component("propsList", {
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			props: [],
-			modalComponent: false
-		};
-	},
-	created: function() {
-		let self = this;
-		self.$emit("loading", false);
+	data: () => ({
+		props: [],
+		modalComponent: false
+	}),
+	created() {
+		this.$emit("loading", false);
 		loadData("props").then(data => {
-			self.props = data.props;
-			self.load = false;
-			self.$emit("loading", false);
+			this.props = data.props;
+			this.load = false;
+			this.$emit("loading", false);
 		});
 	},
 	methods: {
-		closeModal: function() {
+		closeModal() {
 			this.modalComponent = false;
 		},
-		editProp: function() {
+		editProp() {
 			alert("pending");
 		},
-		deleteProp: function() {
+		deleteProp() {
 			alert("pending");
 		},
-		newProp: function() {
+		newProp() {
 			this.modalComponent = "propForm";
 		},
-		insertNewProp: function(data) {
+		insertNewProp(data) {
 			this.props.push(data.prop);
 		}
 	},
@@ -602,11 +635,11 @@ Vue.component("propsList", {
 	<div class="row">
 		<div class="col-12">
 			<button class="btn btn-success my-3 btn-block" @click="newProp">
-				<i class="fas fa-plus float-left" style="line-height: inherit" ></i> New Photobooth
+				<i class="fas fa-plus float-left" style="line-height: inherit" ></i> New Prop
 			</button>
 			<modal 
 				v-if="modalComponent"
-				:modal-info="{id: 'modal-props', title: 'Photobooth type'}"
+				:modal-info="{id: 'modal-props', title: 'Prop'}"
 				:component="modalComponent"
 				@modalClosed="closeModal"
 				@saved="insertNewProp">
@@ -660,29 +693,26 @@ Vue.component("propsList", {
 Vue.component("propForm", {
 	props: ["prop"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {
-			propModel: {
-				name: "",
-				description: ""
-			},
-			ajax: "new",
-			loading: false
-		};
-	},
+	data: () => ({
+		propModel: {
+			name: "",
+			description: ""
+		},
+		ajax: "new",
+		loading: false
+	}),
 	methods: {
-		saveProp: function(e) {
-			let self = this;
+		saveProp(e) {
 			e.preventDefault();
-			self.loading = true;
+			this.loading = true;
 			loadData("prop", {
-				...self.propModel,
-				ajax: self.ajax
+				...this.propModel,
+				ajax: this.ajax
 			}).then(data => {
 				if (data.save) {
-					self.$emit("saved", data);
+					this.$emit("saved", data);
 				} else {
-					self.loading = false;
+					this.loading = false;
 				}
 				if (data.error) {
 					showError(data.error);
@@ -705,11 +735,11 @@ Vue.component("propForm", {
 			<div class="col-12">
 				<div class="input-group mb-3">
 					<div class="input-group-prepend">
-						<span class="input-group-text" id="photobooth_upload">Upload</span>
+						<span class="input-group-text" id="prop_upload">Upload</span>
 					</div>
 					<div class="custom-file">
-						<input type="file" class="custom-file-input" id="photobooth_image" name="image" aria-describedby="photobooth_upload" disabled>
-						<label class="custom-file-label" for="photobooth_image">Choose file</label>
+						<input type="file" class="custom-file-input" id="prop_image" name="image" aria-describedby="prop_upload" disabled>
+						<label class="custom-file-label" for="prop_image">Choose file</label>
 					</div>
 				</div>
 			</div>
@@ -732,21 +762,18 @@ Vue.component("propForm", {
 Vue.component("modal", {
 	props: ["modalInfo", "component"],
 	delimiters: ["#{", "}"],
-	data: function() {
-		return {};
-	},
-	created: function() {
-		let self = this;
+	data: () => ({}),
+	created() {
 		setTimeout(() => {
-			$(`#${self.modalInfo.id}`).modal("show");
-			$(`#${self.modalInfo.id}`).on("hidden.bs.modal", () => {
-				$(`#${self.modalInfo.id}`).off("hidden.bs.modal");
-				self.$emit("modalClosed");
+			$(`#${this.modalInfo.id}`).modal("show");
+			$(`#${this.modalInfo.id}`).on("hidden.bs.modal", () => {
+				$(`#${this.modalInfo.id}`).off("hidden.bs.modal");
+				this.$emit("modalClosed");
 			});
 		}, 1);
 	},
 	methods: {
-		resendSavedData: function(data) {
+		resendSavedData(data) {
 			this.$emit("saved", data);
 			$(`#${this.modalInfo.id}`).modal("hide");
 		}

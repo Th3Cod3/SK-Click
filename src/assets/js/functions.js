@@ -55,7 +55,7 @@ const showError = (error, $element) => {
 		$element = document.body;
 	}
 	for (var key in error) {
-		date = new Date();
+		let date = new Date();
 		$element.insertAdjacentHTML(
 			"afterbegin",
 			`
@@ -67,11 +67,11 @@ const showError = (error, $element) => {
 		</div>
 		`
 		);
+		let $alert = $element.querySelector(`[data-error-id="${date.getTime}"]`);
+		setTimeout(() => {
+			$($alert).alert("close");
+		}, 5000);
 	}
-	$alert = $element.querySelector(`[data-error-id="${date.getTime}"]`);
-	setTimeout(() => {
-		$($alert).alert("close");
-	}, 5000);
 };
 
 const errorHandler = xhr => {

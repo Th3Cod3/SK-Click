@@ -10,6 +10,7 @@ use App\Models\Backdrop;
 use App\Models\Prop;
 use App\Models\Division;
 use App\Models\Event;
+use App\Models\Photobooth;
 use Sirius\Validation\Validator;
 
 class ApiController extends TwigController
@@ -83,6 +84,39 @@ class ApiController extends TwigController
 			$error = $validator->getMessages();
 		}
 		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "backdrop" => $backdrop ?? null, "error" => $error ?? null]);
+		return $result;
+	}
+
+	public function postPhotobooths()
+	{
+		$photobooths = Photobooth::all()->toArray();
+		$result = json_encode(["photobooths" => $photobooths]);
+		return $result;
+	}
+
+	public function anyPhotobooth()
+	{
+		if (isset($_POST["ajax"]) && $_POST["ajax"]) {
+			$validator = new Validator;
+			$photobooth = new Photobooth;
+			$validator->add("name", "required");
+			if ($validator->validate($_POST)) {
+				if ($_POST["ajax"] == "new") {
+					$photobooth->name = $_POST["name"];
+					// TODO pending to implement image upload
+				}
+				try {
+					$save = $photobooth->save();
+					$photobooth = $photobooth->toArray();
+				} catch (\Throwable $th) {
+					if ($th->getCode() == 23000) {
+						$validator->addMessage('Duplicated:', 'This photobooth already exist');
+					}
+				}
+			}
+			$error = $validator->getMessages();
+		}
+		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "photobooth" => $photobooth ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
@@ -183,7 +217,7 @@ class ApiController extends TwigController
 				$save = $event->save();
 				$event = $event->toArray();
 			}
-			$error = $validator->getMessages();
+			$error = $validator->getMessages()->toArray();
 		}
 		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "event" => $event ?? null, "error" => $error ?? null]);
 		return $result;

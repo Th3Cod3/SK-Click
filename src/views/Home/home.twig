@@ -6,10 +6,10 @@
 				Divisions
 				<span class="float-right">
 					<div class="btn-group btn-group-sm">
-						<a class="btn btn-primary" :href="dashboardUrl"
-							><i class="fas fa-cog"></i>
-							<span class="d-none d-md-inline">Dashboard</span></a
-						>
+						<a class="btn btn-primary" :href="dashboardUrl">
+							<i class="fas fa-cog"></i>
+							<span class="d-none d-md-inline">Dashboard</span>
+						</a>
 					</div>
 				</span>
 			</div>
@@ -36,22 +36,19 @@
 	let home = new Vue({
 		el: "#app-body",
 		delimiters: ["#{", "}"],
-		data() {
-			return {
-				divisions: [],
-				loading: true,
-				dashboardUrl: BASEURL + "dashboard/"
-			};
-		},
-		created: function() {
-			let self = this;
+		data:() => ({
+			divisions: [],
+			loading: true,
+			dashboardUrl: BASEURL + "dashboard/"
+		}),
+		created() {
 			loadData("divisions").then(data => {
-				self.divisions = data.divisions;
-				self.loading = false;
+				this.divisions = data.divisions;
+				this.loading = false;
 			});
 		},
 		methods: {
-			toggleLoaderIcon: function(loading) {
+			toggleLoaderIcon(loading) {
 				this.loading = loading;
 			}
 		}

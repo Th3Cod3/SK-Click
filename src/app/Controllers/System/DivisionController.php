@@ -16,5 +16,16 @@ class DivisionController extends TwigController
 			"division_id" => $division->id
 		]);
 	}
+
+	public function anyManage(string $division_url)
+	{
+		$division = Division::where("url", $division_url)->firstOrFail();
+		return $this->render("Division/manage.twig", [
+			'delnav' => true,
+			"app_title" => "Manage: ".$division["name"],
+			"division" => $division->toArray(),
+			"division_id" => $division->id
+		]);
+	}
 }
 ?>

@@ -1,10 +1,3 @@
-/***********************
- * EVENT COMPONENTS
- ************************/
-
-/*
-/* EVENT CARD
-*/
 Vue.component("loader", {
 	props: {
 		loading: {},
@@ -60,6 +53,111 @@ Vue.component("tabsNavbar", {
 	`
 });
 
+/***********************
+ * EVENT COMPONENTS
+ ************************/
+
+/*
+/* EVENT FORM
+*/
+
+Vue.component("eventForm", {
+	props: ["event"],
+	delimiters: ["#{", "}"],
+	data: () => ({
+		eventModel: {
+			name: "",
+			description: ""
+		},
+		ajax: "new",
+		loading: false
+	}),
+	methods: {
+		saveEvent(e) {
+			e.preventDefault();
+			this.loading = true;
+			loadData("event", {
+				...this.eventModel,
+				ajax: this.ajax
+			}).then(data => {
+				if (data.save) {
+					this.$emit("saved", data);
+				} else {
+					this.loading = false;
+				}
+				if (data.error) {
+					showError(data.error);
+				}
+			});
+		}
+	},
+	template: `
+	<form @submit="saveEvent">
+		<div class="row">
+			<div class="col-12">
+				<div class="form-group">
+					<label for="name">
+						<h5>Event name</h5>
+					</label>
+					<input type="text" class="form-control" v-model="eventModel.name" placeholder="Name" required>
+				</div>
+			</div>
+
+			<div class="col-12">
+				<div class="form-group">
+					<label for="venue">
+						<h5>Venue</h5>
+					</label>
+					<input type="text" class="form-control" v-model="eventModel.venue" placeholder="Venue" required>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6">
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" id="usb" v-model="eventModel.usb">
+					<label class="form-check-label" for="usb">Include USB</label>
+				</div>
+			</div>
+
+			<div class="col-sm-12 col-md-6">
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" id="printing" v-model="eventModel.printing">
+					<label class="form-check-label" for="printing">Include unlimited printing</label>
+				</div>
+			</div>
+
+			<div class="col-12">
+				<div class="form-group">
+					<label for="from_date">
+						<h5>From</h5>
+					</label>
+					<input type="datetime-local" class="form-control" v-model="eventModel.from_date" required>
+				</div>
+			</div>
+
+			<div class="col-12">
+				<div class="form-group">
+					<label for="to_date">
+						<h5>To</h5>
+					</label>
+					<input type="datetime-local" class="form-control" v-model="eventModel.to_date" required>
+				</div>
+			</div>
+
+			<input type="hidden" v-model="eventModel.division_id">
+
+			<div class="col-12">
+				<button type="submit" class="btn btn-block btn-success" :disabled="loading">SAVE</button>
+			</div>
+		</div>
+	</form>
+	`
+});
+
+/*
+/* EVENT CARD
+*/
+
 Vue.component("eventCard", {
 	props: ["event"],
 	delimiters: ["#{", "}"],
@@ -67,6 +165,14 @@ Vue.component("eventCard", {
 	computed: {
 		eventUrl() {
 			return BASEURL + "event/" + this.event.id;
+		}
+	},
+	methods: {
+		editEvent() {
+			alert("pending");
+		},
+		deleteEvent() {
+			alert("pending");
 		}
 	},
 	// :href="eventUrl"
@@ -96,6 +202,54 @@ Vue.component("eventCard", {
 				</table>
 			</div>
 		</a>
+	`
+});
+
+/*
+/* EVENT CARD HOLDER
+*/
+
+Vue.component("eventCardHolder", {
+	delimiters: ["#{", "}"],
+	data: () => ({
+		events: [],
+		modalComponent: false
+	}),
+	created() {
+		this.$emit("loading", true);
+		loadData("events").then(data => {
+			this.events = data.events;
+			this.$emit("loading", false);
+		});
+	},
+	methods: {
+		closeModal() {
+			this.modalComponent = false;
+		},
+		newEvent() {
+			this.modalComponent = "eventForm";
+		},
+		insertNewEvent(data) {
+			this.events.push(data.event);
+		}
+	},
+	template: `
+	<div class="row">
+		<div class="col-12">
+			<button class="btn btn-success btn-block" @click="newEvent">New event</button>
+		</div>
+		<modal
+			v-if="modalComponent"
+			:modal-info="{id: 'modal-event', title: 'Event'}"
+			@modalClosed="closeModal"
+		>
+			<component :is="modalComponent" @saved="insertNewEvent"></component>
+		</modal>
+		<div class="col-md-6 col-sm-12 mb-3" v-for="event in events">
+			<event-card :event="event">
+			</event-card>
+		</div>
+	</div>
 	`
 });
 
@@ -142,10 +296,9 @@ Vue.component("divisionsList", {
 		}
 	},
 	created() {
-		this.$emit("loading", false);
+		this.$emit("loading", true);
 		loadData("divisions").then(data => {
 			this.divisions = data.divisions;
-			this.load = false;
 			this.$emit("loading", false);
 		});
 	},
@@ -175,9 +328,9 @@ Vue.component("divisionsList", {
 			<modal 
 				v-if="modalComponent"
 				:modal-info="{id: 'modal-divisions', title: 'Division'}"
-				:component="modalComponent"
 				@modalClosed="closeModal"
-				@saved="insertNewDivision">
+			>
+				<component :is="modalComponent" @saved="insertNewDivision"></component>
 			</modal>
 			<div class="py-1 px-2">
 				<div class="row font-weight-bold">
@@ -276,7 +429,7 @@ Vue.component("divisionForm", {
 });
 
 /***********************
- * PHOTOBOOTH TYPES COMPONENTS
+ * PHOTOBOOTH COMPONENTS
  ************************/
 
 /*
@@ -289,10 +442,9 @@ Vue.component("boothTypesList", {
 		modalComponent: false
 	}),
 	created() {
-		this.$emit("loading", false);
+		this.$emit("loading", true);
 		loadData("booth_types").then(data => {
 			this.boothTypes = data.booth_types;
-			this.load = false;
 			this.$emit("loading", false);
 		});
 	},
@@ -321,10 +473,10 @@ Vue.component("boothTypesList", {
 			</button>
 			<modal 
 				v-if="modalComponent"
-				:modal-info="{id: 'modal-boothTypes', title: 'Photobooth type'}"
-				:component="modalComponent"
+				:modal-info="{id: 'modal-boothTypes', title: 'Photobooth'}"
 				@modalClosed="closeModal"
-				@saved="insertNewBoothType">
+			>
+				<component :is="modalComponent" @saved="insertNewBoothType"></component>
 			</modal>
 			<div class="py-1 px-2">
 				<div class="row font-weight-bold">
@@ -434,6 +586,266 @@ Vue.component("boothTypeForm", {
 	`
 });
 
+/*
+/* PHOTOBOOTH FORM
+*/
+
+Vue.component("photoboothForm", {
+	props: ["photobooth", "division_id"],
+	delimiters: ["#{", "}"],
+	data: () => ({
+		photoboothModel: {
+			name: "",
+			booth_type_id: "",
+			division_id: ""
+		},
+		boothTypes: [],
+		ajax: "new",
+		loading: false
+	}),
+	created() {
+		this.$emit("loading", true);
+		loadData("booth_types").then(data => {
+			this.boothTypes = data.booth_types;
+			this.$emit("loading", false);
+		});
+		this.photoboothModel.division_id = this.division_id
+	},
+	methods: {
+		savePhotobooth(e) {
+			e.preventDefault();
+			this.loading = true;
+			loadData("photobooth", {
+				...this.photoboothModel,
+				ajax: this.ajax
+			}).then(data => {
+				if (data.save) {
+					this.$emit("saved", data);
+				} else {
+					this.loading = false;
+				}
+				if (data.error) {
+					showError(data.error);
+				}
+			});
+		}
+	},
+	template: `
+	<form @submit="savePhotobooth">
+		<div class="row">
+			<div class="col-12">
+				<div class="form-group">
+					<label for="name">
+						<h5>Name</h5>
+					</label>
+					<input type="text" v-model="photoboothModel.name" class="form-control" placeholder="Name" required>
+				</div>
+			</div>
+			
+			<div class="col-12">
+				<dropdown-search
+					:items="boothTypes"
+					:options="{
+						label: 'Photobooth type',
+						id: 'booth_type_id',
+						placeholder: 'Photobooth type'
+					}"
+					:disabled="boothTypes.length < 1"
+					v-model="photoboothModel.booth_type_id"
+				/>
+			</div>
+
+			<input type="hidden" v-model="photoboothModel.division_id" />
+
+			<div class="col-12">
+				<button type="submit" class="btn btn-block btn-success" :disabled="loading">SAVE</button>
+			</div>
+		</div>
+	</form>
+	`
+});
+
+/*
+/* PHOTOBOOTH LIST
+*/
+
+Vue.component("dropdownSearch", {
+	props: {
+		items: {
+			type: Array,
+			required: true
+		},
+		options: {
+			type: Object,
+			default: () => ({})
+		},
+		disabled: {
+			type: Boolean,
+			required: false
+		}
+	},
+	delimiters: ["#{", "}"],
+	data: () => ({
+		id: "",
+		value: "",
+		selected: false,
+		showOptions: false,
+		activeItem: 0
+	}),
+	methods: {
+		updateValue() {
+			this.value = this.items[this.activeItem].name;
+			this.$emit("input", this.items[this.activeItem].id);
+		},
+		focus() {
+			this.value = "";
+			this.$emit("focus");
+			this.showOptions = true;
+			$(`#${this.options.id}`).dropdown("show");
+		},
+		blur() {
+			this.updateValue();
+			this.$emit("blur");
+			this.showOptions = false;
+			$(`#${this.options.id}`).dropdown("hide");
+		},
+		search(needle) {
+			let result = needle.toLowerCase().match(this.value.toLowerCase());
+			return result;
+		}
+	},
+	watch: {
+		items() {
+			this.updateValue();
+		}
+	},
+	template: `
+	<div class="form-group">
+		<label v-if="options.label" :for="options.id">#{options.label}</label>
+		<div class="dropdown">
+			<input
+				type="text"
+				class="form-control"
+				autocomplete="off"
+				v-model="value"
+				:id="options.id"
+				:placeholder="options.placeholder"
+				:disabled="disabled"
+				@focus="focus"
+				@blur="blur"
+			/>
+			<ul class="dropdown-menu" style="min-width: 100%">
+				<li
+					v-if="search(item.name)"
+					v-for="(item, key) in items"
+					:class="{
+						'dropdown-item': true,
+						'active': activeItem === key ? true : false
+					}"
+					@mouseenter="activeItem = key"
+				>
+					<span v-if="item.image">
+						<img :src="item.image" :alt="item.name + "-image""/>
+					</span>
+					<span v-else class=""><i class="far fa-images"></i></span>
+					#{item.name}
+				</li>
+			</ul>
+		</div>
+	</div>
+	`
+});
+
+/*
+/* PHOTOBOOTH LIST
+*/
+
+Vue.component("photoboothList", {
+	props: [""],
+	delimiters: ["#{", "}"],
+	data: () => ({
+		photobooth: [],
+		modalComponent: false
+	}),
+	created() {
+		this.$emit("loading", true);
+		loadData("photobooth").then(data => {
+			this.photobooth = data.photobooth;
+			this.$emit("loading", false);
+		});
+	},
+	methods: {
+		closeModal() {
+			this.modalComponent = false;
+		},
+		editBoothType() {
+			alert("pending");
+		},
+		deleteBoothType() {
+			alert("pending");
+		},
+		newPhotobooth() {
+			this.modalComponent = true;
+		},
+		insertNewPhotobooth(data) {
+			this.photobooth.push(data.photobooth);
+		}
+	},
+	template: `
+	<div class="row">
+		<div class="col-12">
+			<button class="btn btn-success my-3 btn-block" @click="newPhotobooth">
+				<i class="fas fa-plus float-left" style="line-height: inherit" ></i> New Photobooth
+			</button>
+			<modal
+				v-if="modalComponent"
+				:modal-info="{id: 'modal-photobooth', title: 'Photobooth type'}"
+				@modalClosed="closeModal"
+			>
+				<photobooth-form @saved="insertNewPhotobooth"></photobooth-form>
+			</modal>
+			<div class="py-1 px-2">
+				<div class="row font-weight-bold">
+					<div class="col-2 my-auto">
+						Image
+					</div>
+					<div class="col-7 my-auto">
+						Name
+					</div>
+					<div class="col-3 text-right">
+						Options
+					</div>
+				</div>
+			</div>
+			<hr class="m-0 p-0 mb-1 border-dark">
+			<div class="py-1 px-2 mb-1" v-for="photobooth in photobooth">
+				<div class="row">
+					<div class="col-2 my-auto font-weight-bold">
+						<div v-if="photobooth.image">
+							<img :src="photobooth.image" :alt="photobooth.name + "-image""/>
+						</div>
+						<div v-else class=""><i class="far fa-images"></i></div>
+					</div>
+					<div class="col-7 my-auto font-weight-bold">
+						#{ photobooth.name }
+					</div>
+					<div class="col-3 text-right">
+						<div class="btn-group btn-group-sm">
+							<button class="btn btn-primary" @click="editPhotobooth" disabled>
+								<i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edit</span>
+							</button>
+							<button class="btn btn-danger" @click="deletePhotobooth" disabled>
+								<i class="fas fa-eraser"></i> <span class="d-none d-md-inline">Delete</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	`
+});
+
 /***********************
  * BACKDROPS COMPONENTS
  ************************/
@@ -441,6 +853,7 @@ Vue.component("boothTypeForm", {
 /*
 /* BACKDROPS LIST
 */
+
 Vue.component("backdropsList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
@@ -448,10 +861,9 @@ Vue.component("backdropsList", {
 		modalComponent: false
 	}),
 	created() {
-		this.$emit("loading", false);
+		this.$emit("loading", true);
 		loadData("backdrops").then(data => {
 			this.backdrops = data.backdrops;
-			this.load = false;
 			this.$emit("loading", false);
 		});
 	},
@@ -478,12 +890,12 @@ Vue.component("backdropsList", {
 			<button class="btn btn-success my-3 btn-block" @click="newBackdrop">
 				<i class="fas fa-plus float-left" style="line-height: inherit" ></i> New Backdrop
 			</button>
-			<modal 
+			<modal
 				v-if="modalComponent"
 				:modal-info="{id: 'modal-backdrops', title: 'Backdrop'}"
-				:component="modalComponent"
 				@modalClosed="closeModal"
-				@saved="insertNewBackdrop">
+			>
+				<component :is="modalComponent" @saved="insertNewBackdrop"></component>
 			</modal>
 			<div class="py-1 px-2">
 				<div class="row font-weight-bold">
@@ -600,6 +1012,7 @@ Vue.component("backdropForm", {
 /*
 /* PROPS LIST
 */
+
 Vue.component("propsList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
@@ -607,10 +1020,9 @@ Vue.component("propsList", {
 		modalComponent: false
 	}),
 	created() {
-		this.$emit("loading", false);
+		this.$emit("loading", true);
 		loadData("props").then(data => {
 			this.props = data.props;
-			this.load = false;
 			this.$emit("loading", false);
 		});
 	},
@@ -640,9 +1052,9 @@ Vue.component("propsList", {
 			<modal 
 				v-if="modalComponent"
 				:modal-info="{id: 'modal-props', title: 'Prop'}"
-				:component="modalComponent"
 				@modalClosed="closeModal"
-				@saved="insertNewProp">
+			>
+				<component :is="modalComponent" @saved="insertNewProp"></component>
 			</modal>
 			<div class="py-1 px-2">
 				<div class="row font-weight-bold">
@@ -759,8 +1171,9 @@ Vue.component("propForm", {
 /*
 /* MODAL
 */
+
 Vue.component("modal", {
-	props: ["modalInfo", "component"],
+	props: ["modalInfo"],
 	delimiters: ["#{", "}"],
 	data: () => ({}),
 	created() {
@@ -773,8 +1186,7 @@ Vue.component("modal", {
 		}, 1);
 	},
 	methods: {
-		resendSavedData(data) {
-			this.$emit("saved", data);
+		closeModal() {
 			$(`#${this.modalInfo.id}`).modal("hide");
 		}
 	},
@@ -788,8 +1200,8 @@ Vue.component("modal", {
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<div class="modal-body" v-if="component">
-					<component :is="component" @saved="resendSavedData"></component>
+				<div class="modal-body">
+					<slot></slot>
 				</div>
 			</div>
 		</div>

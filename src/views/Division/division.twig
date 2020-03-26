@@ -5,32 +5,28 @@
 			<div class="card">
 				<div class="card-header text-center font-weight-bold">
 					<span class="float-left">
-						<a class="btn btn-info btn-sm" :href="BASEURL + 'home'">
+						<a class="btn btn-info btn-sm" :href="backUrl">
 							<i class="fas fa-backward"></i> <span class="d-none d-md-inline">Back</span>
 						</a>
 					</span>
 					#{ division.name } events
 					<span class="float-right">
-						<button class="btn btn-success btn-sm" data-target="btn-event" data-division-id="{{ division_id }}" data-ajax="new">
-							<i class="fas fa-plus"></i> <span class="d-none d-md-inline">Add Event</span>
-						</button>
+						<div class="btn-group btn-group-sm">
+							<a class="btn btn-primary" :href="manageUrl">
+								<i class="fas fa-cog"></i>
+								<span class="d-none d-md-inline">Manager</span>
+							</a>
+						</div>
 					</span>
 				</div>
 				<div class="card-body main-card">
-					<div class="loader"></div>
-						<div class="row">
-						<div class="col-12" v-show="load">
-							<div class="d-flex justify-content-center">
-								<div class="spinner-border text-dark" role="status">
-									<span class="sr-only">Loading...</span>
-								</div>
-							</div>
+					<div class="row">
+						<div class="col-12">
+							<loader :loading="loading"></loader>
 						</div>
-						<div class="col-md-6 col-sm-12 mb-3" v-for="event in events">
-							<event-card :event="event">
-							</event-card>
+						<div class="col-12">
+							<event-card-holder @loading="toggleLoaderIcon"></event-card-holder>
 						</div>
-					</div>
 					</div>
 				</div>
 			</div>
@@ -43,21 +39,23 @@
 		let division = new Vue({
 			el: "#app-body",
 			delimiters: ["#{", "}"],
-			data(){
-				return {
+			data: () => ({
 					division: {{ division | json_encode | raw }},
-					events: [],
-					load: true,
+					loading: true,
 					BASEURL
+			}),
+			computed: {
+				manageUrl() {
+					return BASEURL + "division/manage/" + this.division.url;
+				},
+				backUrl() {
+					return BASEURL + "home";
 				}
 			},
-			created: function (){
-				let self = this
-				loadData("events", { division_id: this.division.id })
-					.then(data => {
-						self.events = data.events;
-						self.load = false;
-					})
+			methods: {
+				toggleLoaderIcon(loading) {
+					this.loading = loading;
+				}
 			}
 		});
 	</script>

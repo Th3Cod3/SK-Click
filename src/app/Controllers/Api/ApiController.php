@@ -9,7 +9,10 @@ use App\Models\Booth_type;
 use App\Models\Backdrop;
 use App\Models\Prop;
 use App\Models\Division;
+use App\Models\Division_backdrop;
+use App\Models\Division_prop;
 use App\Models\Event;
+use App\Models\Event_photobooth;
 use App\Models\Photobooth;
 use Sirius\Validation\Validator;
 
@@ -21,10 +24,38 @@ class ApiController extends TwigController
 		return $login->authenticate();
 	}
 
-	public function postProps()
+	public function getProps()
 	{
 		$props = Prop::all()->toArray();
 		$result = json_encode(["props" => $props]);
+		return $result;
+	}
+
+	public function getDivision_props()
+	{
+		$props = Division_prop::where("division_id", $_GET["division_id"])->get()->toArray();
+		$result = json_encode(["props" => $props]);
+		return $result;
+	}
+
+	public function anyDivision_prop()
+	{
+		if (isset($_POST["ajax"]) && $_POST["ajax"]) {
+			$validator = new Validator;
+			$prop = new Division_prop;
+			$validator->add("prop_id", "required");
+			$validator->add("division_id", "required");
+			if ($validator->validate($_POST)) {
+				if ($_POST["ajax"] == "new") {
+					$prop->prop_id = $_POST["prop_id"];
+					$prop->division_id = $_POST["division_id"];
+				}
+				$save = $prop->save();
+				$prop = $prop->load("prop")->toArray();
+			}
+			$error = $validator->getMessages();
+		}
+		$result = json_encode(["save" => $save ?? null, "prop" => $prop ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
@@ -50,14 +81,42 @@ class ApiController extends TwigController
 			}
 			$error = $validator->getMessages();
 		}
-		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "prop" => $prop ?? null, "error" => $error ?? null]);
+		$result = json_encode(["save" => $save ?? null, "prop" => $prop ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
-	public function postBackdrops()
+	public function getBackdrops()
 	{
 		$backdrops = Backdrop::all()->toArray();
 		$result = json_encode(["backdrops" => $backdrops]);
+		return $result;
+	}
+
+	public function getDivision_backdrops()
+	{
+		$backdrops = Division_backdrop::where("division_id", $_GET["division_id"])->get()->toArray();
+		$result = json_encode(["backdrops" => $backdrops]);
+		return $result;
+	}
+
+	public function anyDivision_backdrop()
+	{
+		if (isset($_POST["ajax"]) && $_POST["ajax"]) {
+			$validator = new Validator;
+			$backdrop = new Division_backdrop;
+			$validator->add("backdrop_id", "required");
+			$validator->add("division_id", "required");
+			if ($validator->validate($_POST)) {
+				if ($_POST["ajax"] == "new") {
+					$backdrop->backdrop_id = $_POST["backdrop_id"];
+					$backdrop->division_id = $_POST["division_id"];
+				}
+				$save = $backdrop->save();
+				$backdrop = $backdrop->load("backdrop")->toArray();
+			}
+			$error = $validator->getMessages();
+		}
+		$result = json_encode(["save" => $save ?? null, "backdrop" => $backdrop ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
@@ -83,14 +142,22 @@ class ApiController extends TwigController
 			}
 			$error = $validator->getMessages();
 		}
-		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "backdrop" => $backdrop ?? null, "error" => $error ?? null]);
+		$result = json_encode(["save" => $save ?? null, "backdrop" => $backdrop ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
-	public function postPhotobooths()
+	public function getPhotobooths()
 	{
-		$photobooths = Photobooth::all()->toArray();
-		$result = json_encode(["photobooths" => $photobooths]);
+		if(isset($_GET["division_id"])){
+			$photobooths = Photobooth::where("division_id", $_GET["division_id"])->get()->toArray();
+		}else{
+			
+		}
+
+		$result = json_encode([
+			"photobooths" => $photobooths ?? [],
+			"error" => $error ?? null
+		]);
 		return $result;
 	}
 
@@ -100,14 +167,17 @@ class ApiController extends TwigController
 			$validator = new Validator;
 			$photobooth = new Photobooth;
 			$validator->add("name", "required");
+			$validator->add("division_id", "required");
+			$validator->add("booth_type_id", "required");
 			if ($validator->validate($_POST)) {
 				if ($_POST["ajax"] == "new") {
 					$photobooth->name = $_POST["name"];
-					// TODO pending to implement image upload
+					$photobooth->division_id = $_POST["division_id"];
+					$photobooth->booth_type_id = $_POST["booth_type_id"];
 				}
 				try {
 					$save = $photobooth->save();
-					$photobooth = $photobooth->toArray();
+					$photobooth = $photobooth->load("booth_type")->toArray();
 				} catch (\Throwable $th) {
 					if ($th->getCode() == 23000) {
 						$validator->addMessage('Duplicated:', 'This photobooth already exist');
@@ -116,11 +186,11 @@ class ApiController extends TwigController
 			}
 			$error = $validator->getMessages();
 		}
-		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "photobooth" => $photobooth ?? null, "error" => $error ?? null]);
+		$result = json_encode(["save" => $save ?? null, "photobooth" => $photobooth ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
-	public function postBooth_types()
+	public function getBooth_types()
 	{
 		$booth_types = Booth_type::all()->toArray();
 		$result = json_encode(["booth_types" => $booth_types]);
@@ -149,11 +219,11 @@ class ApiController extends TwigController
 			}
 			$error = $validator->getMessages();
 		}
-		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "booth_type" => $booth_type ?? null, "error" => $error ?? null]);
+		$result = json_encode(["save" => $save ?? null, "booth_type" => $booth_type ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
-	public function postDivisions()
+	public function getDivisions()
 	{
 		$divisions = Division::all()->toArray();
 		$result = json_encode(["divisions" => $divisions]);
@@ -183,26 +253,29 @@ class ApiController extends TwigController
 			}
 			$error = $validator->getMessages();
 		}
-		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "division" => $division ?? null, "error" => $error ?? null]);
+		$result = json_encode(["save" => $save ?? null, "division" => $division ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 
-	public function postEvents()
+	public function getEvents()
 	{
-		$events = Event::where("division_id", $_POST["division_id"])->orderBy("from_date")->get()->toArray();
+		$events = Event::where("division_id", $_GET["division_id"])->orderBy("from_date")->get()->toArray();
 		$result = json_encode(["events" => $events]);
 		return $result;
 	}
 
-	public function anyEvent()
+	public function postEvent()
 	{
 		if (isset($_POST["ajax"]) && $_POST["ajax"]) {
 			$validator = new Validator;
 			$event = new Event;
+			$photobooths = [];
+			$_POST["from_date"] = str_replace("T", " ", $_POST["from_date"]);
+			$_POST["to_date"] = str_replace("T", " ", $_POST["to_date"]);
 			$validator->add("name", "required");
 			$validator->add("venue", "required");
-			$validator->add("from_date", "required | datetime");
-			$validator->add("to_date", "required | datetime");
+			$validator->add("from_date", "required");
+			$validator->add("to_date", "required");
 			if ($validator->validate($_POST)) {
 				if ($_POST["ajax"] == "new") {
 					$event->name = $_POST["name"];
@@ -213,13 +286,24 @@ class ApiController extends TwigController
 					$event->printing = $_POST["printing"] ?? 0;
 					$event->from_date = $_POST["from_date"];
 					$event->to_date = $_POST["to_date"];
+					foreach ($_POST["photobooths"] as $key => $booth) {
+						$photobooths[$key] = new Event_photobooth;
+						$photobooths[$key]->photobooth_id = $booth["photobooth"]["id"];
+						$photobooths[$key]->division_backdrop_id = $booth["backdrop"];
+					}
 				}
 				$save = $event->save();
+				if($save){
+					foreach ($photobooths as $key => $booth) {
+						$booth->event_id = $event->id;
+						$booth->save();
+					}
+				}
 				$event = $event->toArray();
 			}
-			$error = $validator->getMessages()->toArray();
+			$error = $validator->getMessages();
 		}
-		$result = json_encode(["html" => $html ?? null, "save" => $save ?? null, "event" => $event ?? null, "error" => $error ?? null]);
+		$result = json_encode(["save" => $save ?? null, "event" => $event ?? null, "error" => $error ?? null]);
 		return $result;
 	}
 }

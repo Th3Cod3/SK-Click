@@ -2,7 +2,7 @@ CREATE TABLE photobooths (
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(30) NOT NULL,
 	division_id INT NOT NULL,
-	booth_type VARCHAR(100) NOT NULL,
+	booth_type_id INT NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,
@@ -23,10 +23,34 @@ CREATE TABLE booth_types (
 	PRIMARY KEY (id)
 );
 
+CREATE TABLE division_backdrops (
+	id INT NOT NULL AUTO_INCREMENT,
+	backdrop_id INT NOT NULL,
+	division_id INT NOT NULL,
+	last_edit_by INT NOT NULL,
+	created_by INT NOT NULL,
+	deleted_at TIMESTAMP NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+);
+
 CREATE TABLE backdrops (
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(100) NOT NULL,
 	image VARCHAR(200) NULL,
+	last_edit_by INT NOT NULL,
+	created_by INT NOT NULL,
+	deleted_at TIMESTAMP NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE division_props (
+	id INT NOT NULL AUTO_INCREMENT,
+	prop_id INT NOT NULL,
+	division_id INT NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,

@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Photobooth extends Model {
+class Division_prop extends Model {
 	use SoftDeletes;
 
 	protected $dates = ['deleted_at'];
-	protected $with = ['booth_type'];
+	protected $with = ['prop'];
 
 	public function division()
 	{
 		return $this->belongsTo(Division::class);
 	}
 
-	public function booth_type()
+	public function prop()
 	{
-		return $this->belongsTo(Booth_type::class);
+		return $this->belongsTo(Prop::class);
 	}
 }

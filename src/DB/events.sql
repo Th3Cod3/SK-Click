@@ -20,7 +20,19 @@ CREATE TABLE event_photobooths (
 	id INT NOT NULL AUTO_INCREMENT,
 	photobooth_id INT NOT NULL,
 	event_id INT NOT NULL,
-	backdrop INT NOT NULL,
+	division_backdrop_id INT NOT NULL,
+	last_edit_by INT NOT NULL,
+	created_by INT NOT NULL,
+	deleted_at TIMESTAMP NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE event_props (
+	id INT NOT NULL AUTO_INCREMENT,
+	event_id INT NOT NULL,
+	division_prop_id INT NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,

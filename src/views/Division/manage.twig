@@ -26,7 +26,7 @@
 							<loader :loading="loading"></loader>
 						</div>
 						<div class="col-12">
-							<component @loading="toggleLoaderIcon" :is="component"></component>
+							<component @loading="toggleLoaderIcon" :is="component" :division-id="division.id"></component>
 						</div>
 					</div>
 					</div>

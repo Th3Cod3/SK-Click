@@ -25,7 +25,7 @@
 							<loader :loading="loading"></loader>
 						</div>
 						<div class="col-12">
-							<event-card-holder @loading="toggleLoaderIcon"></event-card-holder>
+							<event-card-holder @loading="toggleLoaderIcon" :division-id="division.id" />
 						</div>
 					</div>
 				</div>

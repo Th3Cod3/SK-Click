@@ -42,7 +42,7 @@
 			dashboardUrl: BASEURL + "dashboard/"
 		}),
 		created() {
-			loadData("divisions").then(data => {
+			loadDataGET("divisions").then(data => {
 				this.divisions = data.divisions;
 				this.loading = false;
 			});

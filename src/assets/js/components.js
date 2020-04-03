@@ -821,7 +821,7 @@ Vue.component("boothTypeForm", {
 		saveBoothType(e) {
 			e.preventDefault();
 			this.loading = true;
-			loadDataGET("booth_type", {
+			loadData("booth_type", {
 				...this.boothTypeModel,
 				ajax: this.ajax
 			}).then(data => {

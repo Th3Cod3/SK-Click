@@ -44,6 +44,31 @@ loadDataGET = (request, sendData, alwaysCallback) => {
 	});
 };
 
+loadDataMultipart = (request, sendData, alwaysCallback) => {
+	return new Promise((response, reject) => {
+		$.ajax({
+			type: "POST",
+			url: `${BASEURL}api/${request}`,
+			data: sendData,
+			dataType: "json",
+			processData: false,
+			contentType: false
+		})
+			.done(data => {
+				response(data);
+			})
+			.fail((xhr, textStatus, errorThrown) => {
+				errorHandler(xhr);
+				reject();
+			})
+			.always(() => {
+				if (alwaysCallback) {
+					alwaysCallback();
+				}
+			});
+	});
+};
+
 const getValueById = id => {
 	return document.getElementById(id) && document.getElementById(id).value;
 };
@@ -82,24 +107,5 @@ const errorHandler = xhr => {
 	} else {
 		alert("Error: Unexpected error.");
 	}
-};
-
-const getFormData = formElement => {
-	let $formInputs = formElement.elements;
-	let sendData = {};
-	for (let i = 0; i < $formInputs.length; i++) {
-		if (
-			($formInputs[i].type === "radio" || $formInputs[i].type === "checkbox") &&
-			$formInputs[i].checked
-		) {
-			sendData[$formInputs[i].name] = $formInputs[i].value;
-		} else if (
-			$formInputs[i].type != "radio" &&
-			$formInputs[i].type != "checkbox"
-		) {
-			sendData[$formInputs[i].name] = $formInputs[i].value;
-		}
-	}
-	return sendData;
 };
 

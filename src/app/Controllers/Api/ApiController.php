@@ -282,14 +282,16 @@ class ApiController extends TwigController
 					$event->ref_num = EventHelper::createRef_num();
 					$event->division_id = $_POST["division_id"];
 					$event->venue = $_POST["venue"];
-					$event->usb = $_POST["usb"] ?? 0;
-					$event->printing = $_POST["printing"] ?? 0;
+					$event->usb = $_POST["usb"] === "true" ? 1:0;
+					$event->printing = $_POST["printing"] === "true" ? 1:0;
 					$event->from_date = $_POST["from_date"];
 					$event->to_date = $_POST["to_date"];
 					foreach ($_POST["photobooths"] as $key => $booth) {
 						$photobooths[$key] = new Event_photobooth;
 						$photobooths[$key]->photobooth_id = $booth["photobooth"]["id"];
 						$photobooths[$key]->division_backdrop_id = $booth["backdrop"];
+						$photobooths[$key]->touch_to_start = $booth["touch_to_start"] === "true" ? 1:0;
+						$photobooths[$key]->photo_layer = $booth["photo_layer"] === "true" ? 1:0;
 					}
 				}
 				$save = $event->save();
@@ -299,7 +301,7 @@ class ApiController extends TwigController
 						$booth->save();
 					}
 				}
-				$event = $event->toArray();
+				$event = $event->load("event_photobooths")->toArray();
 			}
 			$error = $validator->getMessages();
 		}

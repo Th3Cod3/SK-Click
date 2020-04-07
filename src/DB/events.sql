@@ -21,6 +21,8 @@ CREATE TABLE event_photobooths (
 	photobooth_id INT NOT NULL,
 	event_id INT NOT NULL,
 	division_backdrop_id INT NOT NULL,
+	photo_layer TINYINT(1) NOT NULL,
+	touch_to_start TINYINT(1) NOT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,

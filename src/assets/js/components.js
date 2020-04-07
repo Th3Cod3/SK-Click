@@ -22,7 +22,7 @@ Vue.component("modal", {
 	methods: {
 		closeModal() {
 			$(`#${this.modalInfo.id}`).modal("hide");
-		}
+		},
 	},
 	template: `
 	<div class="modal fade" :id="modalInfo.id" tabindex="-1" role="dialog" aria-hidden="true">
@@ -40,7 +40,7 @@ Vue.component("modal", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -54,8 +54,8 @@ Vue.component("loader", {
 			Type: Object,
 			default: () => {
 				return {};
-			}
-		}
+			},
+		},
 	},
 	delimiters: ["#{", "}"],
 	data: () => ({}),
@@ -72,7 +72,7 @@ Vue.component("loader", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -86,7 +86,7 @@ Vue.component("tabsNavbar", {
 	methods: {
 		clicked(selectedOption) {
 			this.$emit("change-option", selectedOption);
-		}
+		},
 	},
 	template: `
 	<ul class="nav nav-tabs text-primary">
@@ -103,7 +103,7 @@ Vue.component("tabsNavbar", {
 			</span>
 		</li>
 	</ul>
-	`
+	`,
 });
 
 /*
@@ -114,16 +114,16 @@ Vue.component("dropdownSearch", {
 	props: {
 		items: {
 			type: Array,
-			required: true
+			required: true,
 		},
 		options: {
 			type: Object,
-			default: () => ({})
+			default: () => ({}),
 		},
 		disabled: {
 			type: Boolean,
-			required: false
-		}
+			required: false,
+		},
 	},
 	delimiters: ["#{", "}"],
 	data: () => ({
@@ -131,14 +131,14 @@ Vue.component("dropdownSearch", {
 		value: "",
 		selected: false,
 		showOptions: false,
-		activeItem: 0
+		activeItem: 0,
 	}),
 	methods: {
 		updateValue() {
-			if(this.items.length == 0){
+			if (this.items.length == 0) {
 				this.value = "No options";
 				this.$emit("input", "");
-			}else{
+			} else {
 				this.value = this.items[this.activeItem].name;
 				this.$emit("input", this.items[this.activeItem].id);
 			}
@@ -158,12 +158,12 @@ Vue.component("dropdownSearch", {
 		search(needle) {
 			let result = needle.toLowerCase().match(this.value.toLowerCase());
 			return result;
-		}
+		},
 	},
 	watch: {
 		items() {
 			this.updateValue();
-		}
+		},
 	},
 	template: `
 	<div class="form-group">
@@ -199,7 +199,7 @@ Vue.component("dropdownSearch", {
 			</ul>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /***********************
@@ -217,7 +217,7 @@ Vue.component("eventCard", {
 	computed: {
 		eventUrl() {
 			return BASEURL + "event/" + this.event.id;
-		}
+		},
 	},
 	methods: {
 		editEvent() {
@@ -225,15 +225,19 @@ Vue.component("eventCard", {
 		},
 		deleteEvent() {
 			alert("pending");
-		}
+		},
 	},
 	template: `
 		<a class="card border text-dark">
 			<div class="card-header font-weight-bold">
-				#{ event.name } | #{ event.venue }
+				#{ event.name } <small class="float-right">#{ event.ref_num }</small>
 			</div>
 			<div class="card-body">
 				<table class="table table-borderless table-sm">
+					<tr>
+						<th class="font-weight-bold">Venue</th>
+						<td class="text-right">#{ event.venue }</td>
+					</tr>
 					<tr>
 						<th class="font-weight-bold">Event start:</th>
 						<td class="text-right">#{ event.from_date }</td>
@@ -251,21 +255,25 @@ Vue.component("eventCard", {
 						<td class="text-right">#{ event.usb ? "Yes" : "No" }</td>
 					</tr>
 				</table>
-				<div v-for="photobooth in event.event_photobooths">
+				<div v-for="photobooth in event.event_photobooths" class="border p-2 mb-2">
 					<table class="table table-borderless table-sm">
 						<tr>
 							<th class="font-weight-bold">Photobooth</th>
 							<td class="text-right">#{ photobooth.photobooth.name }</td>
 						</tr>
-						<tr v-if="photobooth.photobooth.division_backdrop">
-							<th class="font-weight-bold">Backdrop</th>
-							<td class="text-right">#{ photobooth.photobooth.division_backdrop.backdrop.name }</td>
+						<tr v-if="photobooth.division_backdrop_id">
+						<th class="font-weight-bold">Backdrop</th>
+						<td class="text-right">#{ photobooth.division_backdrop.backdrop.name }</td>
+						</tr>
+						<tr>
+							<tr v-if="photobooth.photo_layer">* Custom photo layer</tr>
+							<tr v-if="photobooth.touch_to_start">* Custom touch to start</tr>
 						</tr>
 					</table>
 				</div>
 			</div>
 		</a>
-	`
+	`,
 });
 
 /*
@@ -283,47 +291,55 @@ Vue.component("eventForm", {
 			usb: false,
 			printing: false,
 			from_date: "",
-			to_date: ""
+			to_date: "",
 		},
 		photobooths: [],
 		backdrops: [],
 		props: [],
 		photobooth: "",
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	created() {
 		this.$emit("loading", true);
 		this.loading = true;
 		this.eventModel.division_id = this.divisionId;
-		loadDataGET("photobooths", { division_id: this.divisionId }).then(data => {
-			this.photobooths = data.photobooths;
-			this.loading = false;
-			this.$emit("loading", false);
-		});
-		loadDataGET("division_backdrops", { division_id: this.divisionId }).then(data => {
-			this.backdrops = data.backdrops;
-			this.loading = false;
-			this.$emit("loading", false);
-		});
-		loadDataGET("division_props", { division_id: this.divisionId }).then(data => {
-			this.props = data.props;
-			this.loading = false;
-			this.$emit("loading", false);
-		});
+		loadDataGET("photobooths", { division_id: this.divisionId }).then(
+			(data) => {
+				this.photobooths = data.photobooths;
+				this.loading = false;
+				this.$emit("loading", false);
+			}
+		);
+		loadDataGET("division_backdrops", { division_id: this.divisionId }).then(
+			(data) => {
+				this.backdrops = data.backdrops;
+				this.loading = false;
+				this.$emit("loading", false);
+			}
+		);
+		loadDataGET("division_props", { division_id: this.divisionId }).then(
+			(data) => {
+				this.props = data.props;
+				this.loading = false;
+				this.$emit("loading", false);
+			}
+		);
 	},
 	methods: {
 		addPhotobooth() {
-			photobooth = this.photobooths.filter(photobooth => {
+			photobooth = this.photobooths.filter((photobooth) => {
 				return photobooth.id == this.photobooth;
 			})[0];
-			this.photobooths = this.photobooths.filter(photobooth => {
+			this.photobooths = this.photobooths.filter((photobooth) => {
 				return photobooth.id != this.photobooth;
 			});
 			this.eventModel.photobooths.push({
 				photobooth,
 				props: [],
-				backdrop: ""
+				backdrop: "",
+				photo_layer: "",
+				touch_to_start: "",
 			});
 		},
 		saveEvent(e) {
@@ -331,8 +347,8 @@ Vue.component("eventForm", {
 			this.loading = true;
 			loadData("event", {
 				...this.eventModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -342,25 +358,25 @@ Vue.component("eventForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	watch: {
 		backdrops() {
-			this.backdrops.map(backdrop => {
+			this.backdrops.map((backdrop) => {
 				backdrop.name = backdrop.backdrop.name;
 				backdrop.image = backdrop.backdrop.image;
 				delete backdrop.backdrop;
 				return backdrop;
-			})
+			});
 		},
 		props() {
-			this.props.map(prop => {
+			this.props.map((prop) => {
 				prop.name = prop.prop.name;
 				prop.image = prop.prop.image;
 				delete prop.prop;
 				return prop;
-			})
-		}
+			});
+		},
 	},
 	template: `
 	<form @submit="saveEvent">
@@ -450,7 +466,7 @@ Vue.component("eventForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /*
@@ -462,22 +478,38 @@ Vue.component("eventPhotobooth", {
 	delimiters: ["#{", "}"],
 	data: () => ({}),
 	methods: {
-		addProp() {}
+		addProp() {},
 	},
 	template: `
-		<div class="border p-2 mb-3">
-			<h6>Photobooth: #{ photobooth.photobooth.name }</h6>
-			<dropdown-search
-				:items="backdrops"
-				:options="{
-					id: 'backdrop-' + unique,
-					placeholder: 'Backdrop'
-				}"
-				:disabled="backdrops.length < 1"
-				v-model="photobooth.backdrop"
-			/>
+		<div class="row border m-2 p-2">
+			<div class="col-12">
+				<h6>Photobooth: #{ photobooth.photobooth.name }</h6>
+				<dropdown-search
+					:items="backdrops"
+					:options="{
+						id: 'backdrop-' + unique,
+						placeholder: 'Backdrop'
+					}"
+					:disabled="backdrops.length < 1"
+					v-model="photobooth.backdrop"
+				/>
+			</div>
+			
+			<div class="col-sm-12 col-md-6">
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" :id="'photo_layer_' + unique" v-model="photobooth.photo_layer">
+					<label class="form-check-label" :for="'photo_layer_' + unique">Custom photo layer</label>
+				</div>
+			</div>
+			
+			<div class="col-sm-12 col-md-6">
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" :id="'touch_to_start_' + unique" v-model="photobooth.touch_to_start">
+					<label class="form-check-label" :for="'touch_to_start_' + unique">Custom touch to start</label>
+				</div>
+			</div>
 		</div>
-	`
+	`,
 });
 
 /*
@@ -489,11 +521,11 @@ Vue.component("eventCardHolder", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		events: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("events", {division_id: this.divisionId}).then(data => {
+		loadDataGET("events", { division_id: this.divisionId }).then((data) => {
 			this.events = data.events;
 			this.$emit("loading", false);
 		});
@@ -508,7 +540,7 @@ Vue.component("eventCardHolder", {
 		insertNewEvent(data) {
 			this.$refs.modalComponent.closeModal();
 			this.events.push(data.event);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -528,7 +560,7 @@ Vue.component("eventCardHolder", {
 			</event-card>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /***********************
@@ -545,7 +577,7 @@ Vue.component("divisionCard", {
 	computed: {
 		divisionUrl() {
 			return BASEURL + "division/" + this.division.url;
-		}
+		},
 	},
 	template: `
 		<a class="card bg-secondary text-white" :href="divisionUrl">
@@ -556,7 +588,7 @@ Vue.component("divisionCard", {
 				#{ division.description }
 			</div>
 		</a>
-	`
+	`,
 });
 
 /*
@@ -566,16 +598,16 @@ Vue.component("divisionsList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		divisions: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	computed: {
 		divisionUrl() {
 			return BASEURL + "division/" + this.division.url;
-		}
+		},
 	},
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("divisions").then(data => {
+		loadDataGET("divisions").then((data) => {
 			this.divisions = data.divisions;
 			this.$emit("loading", false);
 		});
@@ -596,7 +628,7 @@ Vue.component("divisionsList", {
 		insertNewDivision(data) {
 			this.$refs.modalComponent.closeModal();
 			this.divisions.push(data.division);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -642,7 +674,7 @@ Vue.component("divisionsList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -655,10 +687,10 @@ Vue.component("divisionForm", {
 	data: () => ({
 		divisionModel: {
 			name: "",
-			description: ""
+			description: "",
 		},
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	methods: {
 		saveDivision(e) {
@@ -666,8 +698,8 @@ Vue.component("divisionForm", {
 			this.loading = true;
 			loadData("division", {
 				...this.divisionModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -677,7 +709,7 @@ Vue.component("divisionForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="saveDivision">
@@ -705,7 +737,7 @@ Vue.component("divisionForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /***********************
@@ -719,11 +751,11 @@ Vue.component("boothTypesList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		boothTypes: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("booth_types").then(data => {
+		loadDataGET("booth_types").then((data) => {
 			this.boothTypes = data.booth_types;
 			this.$emit("loading", false);
 		});
@@ -744,7 +776,7 @@ Vue.component("boothTypesList", {
 		insertNewBoothType(data) {
 			this.$refs.modalComponent.closeModal();
 			this.boothTypes.push(data.booth_type);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -799,7 +831,7 @@ Vue.component("boothTypesList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -812,10 +844,10 @@ Vue.component("boothTypeForm", {
 	data: () => ({
 		boothTypeModel: {
 			name: "",
-			description: ""
+			description: "",
 		},
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	methods: {
 		saveBoothType(e) {
@@ -823,8 +855,8 @@ Vue.component("boothTypeForm", {
 			this.loading = true;
 			loadData("booth_type", {
 				...this.boothTypeModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -834,7 +866,7 @@ Vue.component("boothTypeForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="saveBoothType">
@@ -865,7 +897,7 @@ Vue.component("boothTypeForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /*
@@ -879,15 +911,15 @@ Vue.component("photoboothForm", {
 		photoboothModel: {
 			name: "",
 			booth_type_id: "",
-			division_id: ""
+			division_id: "",
 		},
 		boothTypes: [],
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("booth_types").then(data => {
+		loadDataGET("booth_types").then((data) => {
 			this.boothTypes = data.booth_types;
 			this.$emit("loading", false);
 		});
@@ -899,8 +931,8 @@ Vue.component("photoboothForm", {
 			this.loading = true;
 			loadData("photobooth", {
 				...this.photoboothModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -910,7 +942,7 @@ Vue.component("photoboothForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="savePhotobooth">
@@ -944,7 +976,7 @@ Vue.component("photoboothForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /*
@@ -956,15 +988,17 @@ Vue.component("photoboothList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		photobooths: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
 		console.log();
-		loadDataGET("photobooths", { division_id: this.divisionId }).then(data => {
-			this.photobooths = data.photobooths;
-			this.$emit("loading", false);
-		});
+		loadDataGET("photobooths", { division_id: this.divisionId }).then(
+			(data) => {
+				this.photobooths = data.photobooths;
+				this.$emit("loading", false);
+			}
+		);
 	},
 	methods: {
 		closeModal() {
@@ -982,7 +1016,7 @@ Vue.component("photoboothList", {
 		insertNewPhotobooth(data) {
 			this.$refs.modalComponent.closeModal();
 			this.photobooths.push(data.photobooth);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -1046,7 +1080,7 @@ Vue.component("photoboothList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /***********************
@@ -1061,11 +1095,11 @@ Vue.component("backdropsList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		backdrops: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("backdrops").then(data => {
+		loadDataGET("backdrops").then((data) => {
 			this.backdrops = data.backdrops;
 			this.$emit("loading", false);
 		});
@@ -1086,7 +1120,7 @@ Vue.component("backdropsList", {
 		insertNewBackdrop(data) {
 			this.$refs.modalComponent.closeModal();
 			this.backdrops.push(data.backdrop);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -1141,7 +1175,7 @@ Vue.component("backdropsList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -1154,10 +1188,10 @@ Vue.component("backdropForm", {
 	data: () => ({
 		backdropModel: {
 			name: "",
-			description: ""
+			description: "",
 		},
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	methods: {
 		saveBackdrop(e) {
@@ -1165,8 +1199,8 @@ Vue.component("backdropForm", {
 			this.loading = true;
 			loadData("backdrop", {
 				...this.backdropModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -1176,7 +1210,7 @@ Vue.component("backdropForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="saveBackdrop">
@@ -1207,7 +1241,7 @@ Vue.component("backdropForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /*
@@ -1219,12 +1253,12 @@ Vue.component("backdropsDivisionList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		backdrops: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
 		loadDataGET("division_backdrops", { division_id: this.divisionId }).then(
-			data => {
+			(data) => {
 				this.backdrops = data.backdrops;
 				this.$emit("loading", false);
 			}
@@ -1246,7 +1280,7 @@ Vue.component("backdropsDivisionList", {
 		insertNewBackdrop(data) {
 			this.$refs.modalComponent.closeModal();
 			this.backdrops.push(data.backdrop);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -1298,7 +1332,7 @@ Vue.component("backdropsDivisionList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -1311,15 +1345,15 @@ Vue.component("backdropDivisionForm", {
 	data: () => ({
 		backdropModel: {
 			backdrop_id: "",
-			division_id: ""
+			division_id: "",
 		},
 		backdrops: [],
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("backdrops").then(data => {
+		loadDataGET("backdrops").then((data) => {
 			this.backdrops = data.backdrops;
 			this.$emit("loading", false);
 		});
@@ -1331,8 +1365,8 @@ Vue.component("backdropDivisionForm", {
 			this.loading = true;
 			loadData("division_backdrop", {
 				...this.backdropModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -1342,7 +1376,7 @@ Vue.component("backdropDivisionForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="saveBackdrop">
@@ -1367,7 +1401,7 @@ Vue.component("backdropDivisionForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /***********************
@@ -1382,11 +1416,11 @@ Vue.component("propsList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		props: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("props").then(data => {
+		loadDataGET("props").then((data) => {
 			this.props = data.props;
 			this.$emit("loading", false);
 		});
@@ -1407,7 +1441,7 @@ Vue.component("propsList", {
 		insertNewProp(data) {
 			this.$refs.modalComponent.closeModal();
 			this.props.push(data.prop);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -1462,7 +1496,7 @@ Vue.component("propsList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -1475,10 +1509,10 @@ Vue.component("propForm", {
 	data: () => ({
 		propModel: {
 			name: "",
-			description: ""
+			description: "",
 		},
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	methods: {
 		saveProp(e) {
@@ -1486,8 +1520,8 @@ Vue.component("propForm", {
 			this.loading = true;
 			loadData("prop", {
 				...this.propModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -1497,7 +1531,7 @@ Vue.component("propForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="saveProp">
@@ -1528,7 +1562,7 @@ Vue.component("propForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });
 
 /*
@@ -1540,12 +1574,12 @@ Vue.component("propsDivisionList", {
 	delimiters: ["#{", "}"],
 	data: () => ({
 		props: [],
-		modalComponent: false
+		modalComponent: false,
 	}),
 	created() {
 		this.$emit("loading", true);
 		loadDataGET("division_props", { division_id: this.divisionId }).then(
-			data => {
+			(data) => {
 				this.props = data.props;
 				this.$emit("loading", false);
 			}
@@ -1567,7 +1601,7 @@ Vue.component("propsDivisionList", {
 		insertNewProp(data) {
 			this.$refs.modalComponent.closeModal();
 			this.props.push(data.prop);
-		}
+		},
 	},
 	template: `
 	<div class="row">
@@ -1619,7 +1653,7 @@ Vue.component("propsDivisionList", {
 			</div>
 		</div>
 	</div>
-	`
+	`,
 });
 
 /*
@@ -1632,15 +1666,15 @@ Vue.component("propDivisionForm", {
 	data: () => ({
 		propModel: {
 			prop_id: "",
-			division_id: ""
+			division_id: "",
 		},
 		props: [],
 		ajax: "new",
-		loading: false
+		loading: false,
 	}),
 	created() {
 		this.$emit("loading", true);
-		loadDataGET("props").then(data => {
+		loadDataGET("props").then((data) => {
 			this.props = data.props;
 			this.$emit("loading", false);
 		});
@@ -1652,8 +1686,8 @@ Vue.component("propDivisionForm", {
 			this.loading = true;
 			loadData("division_prop", {
 				...this.propModel,
-				ajax: this.ajax
-			}).then(data => {
+				ajax: this.ajax,
+			}).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -1663,7 +1697,7 @@ Vue.component("propDivisionForm", {
 					showError(data.error);
 				}
 			});
-		}
+		},
 	},
 	template: `
 	<form @submit="saveProp">
@@ -1688,5 +1722,5 @@ Vue.component("propDivisionForm", {
 			</div>
 		</div>
 	</form>
-	`
+	`,
 });

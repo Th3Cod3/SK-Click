@@ -1,6 +1,7 @@
 src/composer.phar
 src/composer.lock
 src/vendor/
+src/uploads/
 src/.env
 /dump/
 .vscode

@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Controllers\TwigController;
 use App\Helpers\Event as EventHelper;
 use App\Helpers\Login;
+use App\Helpers\Upload;
 use App\Models\Booth_type;
 use App\Models\Backdrop;
 use App\Models\Prop;
@@ -67,8 +68,14 @@ class ApiController extends TwigController
 			$validator->add("name", "required");
 			if ($validator->validate($_POST)) {
 				if ($_POST["ajax"] == "new") {
+					$file = Upload::saveFile(
+						$_FILES["image"],
+						"backdrops",
+						[ "description" => "Image of the backdrop {$_POST['name']}" ]
+					);
 					$prop->name = $_POST["name"];
-					// TODO pending to implement image upload
+					$prop->image = $file->id;
+					$prop->image_location = $file->location;
 				}
 				try {
 					$save = $prop->save();
@@ -128,8 +135,14 @@ class ApiController extends TwigController
 			$validator->add("name", "required");
 			if ($validator->validate($_POST)) {
 				if ($_POST["ajax"] == "new") {
+					$file = Upload::saveFile(
+						$_FILES["image"],
+						"backdrops",
+						[ "description" => "Image of the backdrop {$_POST['name']}" ]
+					);
 					$backdrop->name = $_POST["name"];
-					// TODO pending to implement image upload
+					$backdrop->image = $file->id;
+					$backdrop->image_location = $file->location;
 				}
 				try {
 					$save = $backdrop->save();
@@ -205,8 +218,14 @@ class ApiController extends TwigController
 			$validator->add("name", "required");
 			if ($validator->validate($_POST)) {
 				if ($_POST["ajax"] == "new") {
+					$file = Upload::saveFile(
+						$_FILES["image"],
+						"backdrops",
+						[ "description" => "Image of the backdrop {$_POST['name']}" ]
+					);
 					$booth_type->name = $_POST["name"];
-					// TODO pending to implement image upload
+					$booth_type->image = $file->id;
+					$booth_type->image_location = $file->location;
 				}
 				try {
 					$save = $booth_type->save();

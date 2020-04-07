@@ -14,7 +14,8 @@ CREATE TABLE photobooths (
 CREATE TABLE booth_types (
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(30) NOT NULL UNIQUE,
-	image VARCHAR(200) NULL,
+	image_location VARCHAR(200) NULL,
+	image INT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,
@@ -38,7 +39,8 @@ CREATE TABLE division_backdrops (
 CREATE TABLE backdrops (
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(100) NOT NULL,
-	image VARCHAR(200) NULL,
+	image_location VARCHAR(200) NULL,
+	image INT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,
@@ -62,7 +64,8 @@ CREATE TABLE division_props (
 CREATE TABLE props (
 	id INT NOT NULL AUTO_INCREMENT,
 	name VARCHAR(100) NOT NULL,
-	image VARCHAR(200) NULL,
+	image_location VARCHAR(200) NULL,
+	image INT NULL,
 	last_edit_by INT NOT NULL,
 	created_by INT NOT NULL,
 	deleted_at TIMESTAMP NULL,

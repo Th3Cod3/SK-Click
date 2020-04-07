@@ -6,3 +6,8 @@ a.card {
 	text-decoration: none;
 }
 
+.img-dropdown-item{
+	width: 50px;
+	max-height: 75px;
+	padding-right: 1rem;
+}

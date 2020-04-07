@@ -73,6 +73,10 @@ const getValueById = id => {
 	return document.getElementById(id) && document.getElementById(id).value;
 };
 
+const baseUrl = () => {
+	return BASEURL;
+};
+
 
 // TODO makes this function a component
 const showError = (error, $element) => {

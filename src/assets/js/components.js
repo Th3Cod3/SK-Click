@@ -43,6 +43,37 @@ Vue.component("modal", {
 	`,
 });
 
+Vue.component("uploadFile", {
+	props: ["file", "options"],
+	delimiters: ["#{", "}"],
+	data: () => ({
+		name: "Select File"
+	}),
+	methods: {
+		fileChange(event) {
+			let file = event.target.files[0];
+			if(file){
+				this.name = file.name;
+			}else{
+				this.file = {};
+				this.name = "Select File";
+			}
+			this.$emit("file-change", file);
+		}
+	},
+	template: `
+	<div class="input-group mb-3">
+		<div class="input-group-prepend">
+			<span class="input-group-text" id="photobooth_upload">Upload</span>
+		</div>
+		<div class="custom-file">
+			<input type="file" class="custom-file-input" :id="options.id" @change="fileChange" :disabled="options.disabled">
+			<label class="custom-file-label" :for="options.id">#{ name }</label>
+		</div>
+	</div>
+	`,
+});
+
 /*
 /* LOADER
 */
@@ -159,6 +190,9 @@ Vue.component("dropdownSearch", {
 			let result = needle.toLowerCase().match(this.value.toLowerCase());
 			return result;
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 	},
 	watch: {
 		items() {
@@ -191,7 +225,7 @@ Vue.component("dropdownSearch", {
 					@mouseenter="activeItem = key"
 				>
 					<span v-if="item.image">
-						<img :src="item.image" :alt="item.name + "-image""/>
+						<img :src="baseUrl() + item.image_location" :alt="item.name + '-image'" class="img-dropdown-item"/>
 					</span>
 					<span v-else class=""><i class="far fa-images"></i></span>
 					#{item.name}
@@ -364,7 +398,7 @@ Vue.component("eventForm", {
 		backdrops() {
 			this.backdrops.map((backdrop) => {
 				backdrop.name = backdrop.backdrop.name;
-				backdrop.image = backdrop.backdrop.image;
+				backdrop.image_location = backdrop.backdrop.image_location;
 				delete backdrop.backdrop;
 				return backdrop;
 			});
@@ -372,7 +406,7 @@ Vue.component("eventForm", {
 		props() {
 			this.props.map((prop) => {
 				prop.name = prop.prop.name;
-				prop.image = prop.prop.image;
+				prop.image_location = prop.prop.image_location;
 				delete prop.prop;
 				return prop;
 			});
@@ -764,6 +798,9 @@ Vue.component("boothTypesList", {
 		closeModal() {
 			this.modalComponent = false;
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 		editBoothType() {
 			alert("pending");
 		},
@@ -809,8 +846,8 @@ Vue.component("boothTypesList", {
 			<div class="py-1 px-2 mb-1" v-for="boothType in boothTypes">
 				<div class="row">
 					<div class="col-2 my-auto font-weight-bold">
-						<div v-if="boothType.image">
-							<img :src="boothType.image" :alt="boothType.name + "-image""/>
+						<div v-if="boothType.image_location">
+							<img :src="baseUrl() + boothType.image_location" :alt="boothType.name + '-image'" class="img-thumbnail"/>
 						</div>
 						<div v-else class=""><i class="far fa-images"></i></div>
 					</div>
@@ -845,6 +882,7 @@ Vue.component("boothTypeForm", {
 		boothTypeModel: {
 			name: "",
 			description: "",
+			image: {}
 		},
 		ajax: "new",
 		loading: false,
@@ -853,10 +891,11 @@ Vue.component("boothTypeForm", {
 		saveBoothType(e) {
 			e.preventDefault();
 			this.loading = true;
-			loadData("booth_type", {
-				...this.boothTypeModel,
-				ajax: this.ajax,
-			}).then((data) => {
+			let formData = new FormData();
+			formData.set("name", this.boothTypeModel.name);
+			formData.set("ajax", this.ajax);
+			formData.set("image", this.boothTypeModel.image, this.boothTypeModel.image.name);
+			loadDataMultipart("booth_type", formData).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -867,6 +906,9 @@ Vue.component("boothTypeForm", {
 				}
 			});
 		},
+		selectedFile(file) {
+			this.boothTypeModel.image = file;
+		}
 	},
 	template: `
 	<form @submit="saveBoothType">
@@ -881,15 +923,7 @@ Vue.component("boothTypeForm", {
 			</div>
 
 			<div class="col-12">
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text" id="photobooth_upload">Upload</span>
-					</div>
-					<div class="custom-file">
-						<input type="file" class="custom-file-input" id="photobooth_image" name="image" aria-describedby="photobooth_upload" disabled>
-						<label class="custom-file-label" for="photobooth_image">Choose file</label>
-					</div>
-				</div>
+				<upload-file :options="{id: 'booth_image'}" @file-change="selectedFile" />
 			</div>
 
 			<div class="col-12">
@@ -1010,6 +1044,9 @@ Vue.component("photoboothList", {
 		deletePhotobooth() {
 			alert("pending");
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 		newPhotobooth() {
 			this.modalComponent = true;
 		},
@@ -1055,8 +1092,8 @@ Vue.component("photoboothList", {
 			<div class="py-1 px-2 mb-1" v-for="photobooth in photobooths">
 				<div class="row">
 					<div class="col-2 my-auto font-weight-bold">
-						<div v-if="photobooth.booth_type.image">
-							<img :src="photobooth.booth_type.image" :alt="photobooth.name + "-image""/>
+						<div v-if="photobooth.booth_type.image_location" >
+							<img :src="baseUrl() + photobooth.booth_type.image_location" :alt="photobooth.name + '-image'" class="img-thumbnail"/>
 						</div>
 						<div v-else class=""><i class="far fa-images"></i></div>
 					</div>
@@ -1121,6 +1158,9 @@ Vue.component("backdropsList", {
 			this.$refs.modalComponent.closeModal();
 			this.backdrops.push(data.backdrop);
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 	},
 	template: `
 	<div class="row">
@@ -1153,8 +1193,8 @@ Vue.component("backdropsList", {
 			<div class="py-1 px-2 mb-1" v-for="backdrop in backdrops">
 				<div class="row">
 					<div class="col-2 my-auto font-weight-bold">
-						<div v-if="backdrop.image">
-							<img :src="backdrop.image" :alt="backdrop.name + "-image""/>
+						<div v-if="backdrop.image_location">
+							<img :src="baseUrl() + backdrop.image_location" :alt="backdrop.name + '-image'" class="img-thumbnail"/>
 						</div>
 						<div v-else class=""><i class="far fa-images"></i></div>
 					</div>
@@ -1188,7 +1228,7 @@ Vue.component("backdropForm", {
 	data: () => ({
 		backdropModel: {
 			name: "",
-			description: "",
+			image: {}
 		},
 		ajax: "new",
 		loading: false,
@@ -1197,10 +1237,11 @@ Vue.component("backdropForm", {
 		saveBackdrop(e) {
 			e.preventDefault();
 			this.loading = true;
-			loadData("backdrop", {
-				...this.backdropModel,
-				ajax: this.ajax,
-			}).then((data) => {
+			let formData = new FormData();
+			formData.set("name", this.backdropModel.name);
+			formData.set("ajax", this.ajax);
+			formData.set("image", this.backdropModel.image, this.backdropModel.image.name);
+			loadDataMultipart("backdrop", formData ).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -1211,6 +1252,9 @@ Vue.component("backdropForm", {
 				}
 			});
 		},
+		selectedFile(file) {
+			this.backdropModel.image = file;
+		}
 	},
 	template: `
 	<form @submit="saveBackdrop">
@@ -1225,15 +1269,7 @@ Vue.component("backdropForm", {
 			</div>
 
 			<div class="col-12">
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text" id="backdrop_upload">Upload</span>
-					</div>
-					<div class="custom-file">
-						<input type="file" class="custom-file-input" id="backdrop_image" name="image" aria-describedby="backdrop_upload" disabled>
-						<label class="custom-file-label" for="backdrop_image">Choose file</label>
-					</div>
-				</div>
+				<upload-file @file-change="selectedFile" :options="{id: 'backdrop_image'}" />
 			</div>
 
 			<div class="col-12">
@@ -1281,6 +1317,9 @@ Vue.component("backdropsDivisionList", {
 			this.$refs.modalComponent.closeModal();
 			this.backdrops.push(data.backdrop);
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 	},
 	template: `
 	<div class="row">
@@ -1313,8 +1352,8 @@ Vue.component("backdropsDivisionList", {
 			<div class="py-1 px-2 mb-1" v-for="backdrop in backdrops">
 				<div class="row">
 					<div class="col-2 my-auto font-weight-bold">
-						<div v-if="backdrop.backdrop.image">
-							<img :src="backdrop.backdrop.image" :alt="backdrop.backdrop.name + "-image""/>
+						<div v-if="backdrop.backdrop.image_location">
+							<img :src="baseUrl() + backdrop.backdrop.image_location" :alt="backdrop.backdrop.name + '-image'" class="img-thumbnail"/>
 						</div>
 						<div v-else class=""><i class="far fa-images"></i></div>
 					</div>
@@ -1442,6 +1481,9 @@ Vue.component("propsList", {
 			this.$refs.modalComponent.closeModal();
 			this.props.push(data.prop);
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 	},
 	template: `
 	<div class="row">
@@ -1474,8 +1516,8 @@ Vue.component("propsList", {
 			<div class="py-1 px-2 mb-1" v-for="prop in props">
 				<div class="row">
 					<div class="col-2 my-auto font-weight-bold">
-						<div v-if="prop.image">
-							<img :src="prop.image" :alt="prop.name + "-image""/>
+						<div v-if="prop.image_location">
+							<img :src="baseUrl() + prop.image_location" :alt="prop.name + '-image'" class="img-thumbnail"/>
 						</div>
 						<div v-else class=""><i class="far fa-images"></i></div>
 					</div>
@@ -1518,10 +1560,11 @@ Vue.component("propForm", {
 		saveProp(e) {
 			e.preventDefault();
 			this.loading = true;
-			loadData("prop", {
-				...this.propModel,
-				ajax: this.ajax,
-			}).then((data) => {
+			let formData = new FormData();
+			formData.set("name", this.propModel.name);
+			formData.set("ajax", this.ajax);
+			formData.set("image", this.propModel.image, this.propModel.image.name);
+			loadDataMultipart("prop", formData).then((data) => {
 				if (data.save) {
 					this.$emit("saved", data);
 				} else {
@@ -1532,6 +1575,9 @@ Vue.component("propForm", {
 				}
 			});
 		},
+		selectedFile(file) {
+			this.propModel.image = file;
+		}
 	},
 	template: `
 	<form @submit="saveProp">
@@ -1546,15 +1592,7 @@ Vue.component("propForm", {
 			</div>
 
 			<div class="col-12">
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text" id="prop_upload">Upload</span>
-					</div>
-					<div class="custom-file">
-						<input type="file" class="custom-file-input" id="prop_image" name="image" aria-describedby="prop_upload" disabled>
-						<label class="custom-file-label" for="prop_image">Choose file</label>
-					</div>
-				</div>
+				<upload-file @file-change="selectedFile" :options="{id: 'prop_image'}" />
 			</div>
 
 			<div class="col-12">
@@ -1602,6 +1640,9 @@ Vue.component("propsDivisionList", {
 			this.$refs.modalComponent.closeModal();
 			this.props.push(data.prop);
 		},
+		baseUrl() {
+			return BASEURL;
+		},
 	},
 	template: `
 	<div class="row">
@@ -1634,8 +1675,8 @@ Vue.component("propsDivisionList", {
 			<div class="py-1 px-2 mb-1" v-for="prop in props">
 				<div class="row">
 					<div class="col-2 my-auto font-weight-bold">
-						<div v-if="prop.prop.image">
-							<img :src="prop.prop.image" :alt="prop.prop.name + "-image""/>
+						<div v-if="prop.prop.image_location">
+							<img :src="baseUrl() + prop.prop.image_location" :alt="prop.prop.name + '-image'" class="img-thumbnail" />
 						</div>
 						<div v-else class=""><i class="far fa-images"></i></div>
 					</div>
